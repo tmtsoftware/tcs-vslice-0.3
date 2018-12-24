@@ -1,0 +1,109 @@
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/CommandHandlerActor.scala:48:39: postfix operator seconds should be enabled[0m
+[0m[[0m[33mwarn[0m] [0m[0mby making the implicit value scala.language.postfixOps visible.[0m
+[0m[[0m[33mwarn[0m] [0m[0mThis can be achieved by adding the import clause 'import scala.language.postfixOps'[0m
+[0m[[0m[33mwarn[0m] [0m[0mor by setting the compiler option -language:postfixOps.[0m
+[0m[[0m[33mwarn[0m] [0m[0mSee the Scaladoc for value scala.language.postfixOps for a discussion[0m
+[0m[[0m[33mwarn[0m] [0m[0mwhy the feature should be explicitly enabled.[0m
+[0m[[0m[33mwarn[0m] [0m[0m  implicit val duration: Timeout = 20 seconds[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                      ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/CommandHandlerActor.scala:14:68: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport csw.params.commands.CommandResponse.{Error, SubmitResponse, ValidateCommandResponse}[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                   ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/DatumCommandActor.scala:33:50: postfix operator seconds should be enabled[0m
+[0m[[0m[33mwarn[0m] [0m[0mby making the implicit value scala.language.postfixOps visible.[0m
+[0m[[0m[33mwarn[0m] [0m[0m  implicit val duration: Timeout            = 60 seconds[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/EventHandlerActor.scala:65:50: postfix operator seconds should be enabled[0m
+[0m[[0m[33mwarn[0m] [0m[0mby making the implicit value scala.language.postfixOps visible.[0m
+[0m[[0m[33mwarn[0m] [0m[0m  implicit val duration: Timeout            = 20 seconds[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/EventHandlerActor.scala:4:18: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport java.util.Calendar[0m
+[0m[[0m[33mwarn[0m] [0m[0m                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/EventHandlerActor.scala:115:15: private method sendEventByEventPublisher in class EventHandlerActor is never used[0m
+[0m[[0m[33mwarn[0m] [0m[0m  private def sendEventByEventPublisher(msg: Event): Future[_] = {[0m
+[0m[[0m[33mwarn[0m] [0m[0m              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/EventHandlerActor.scala:130:15: private method sendEventByOneWayCommand in class EventHandlerActor is never used[0m
+[0m[[0m[33mwarn[0m] [0m[0m  private def sendEventByOneWayCommand(msg: Event, hcdLocation: Option[CommandService]): Future[_] = {[0m
+[0m[[0m[33mwarn[0m] [0m[0m              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/EventHandlerActor.scala:143:17: local val response in method sendEventByOneWayCommand is never used[0m
+[0m[[0m[33mwarn[0m] [0m[0m            val response = Await.result(commandService.oneway(controlCommand), 5.seconds)[0m
+[0m[[0m[33mwarn[0m] [0m[0m                ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/EventHandlerActor.scala:159:15: private method publishDummyEventFromAssembly in class EventHandlerActor is never used[0m
+[0m[[0m[33mwarn[0m] [0m[0m  private def publishDummyEventFromAssembly(): Unit = {[0m
+[0m[[0m[33mwarn[0m] [0m[0m              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/FollowCommandActor.scala:28:38: postfix operator seconds should be enabled[0m
+[0m[[0m[33mwarn[0m] [0m[0mby making the implicit value scala.language.postfixOps visible.[0m
+[0m[[0m[33mwarn[0m] [0m[0m  implicit val duration: Timeout = 1 seconds[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                     ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/LifeCycleActor.scala:12:42: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                         ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/LifeCycleActor.scala:69:9: local val commandTimeout in method doInitialize is never used[0m
+[0m[[0m[33mwarn[0m] [0m[0m    val commandTimeout  = assemblyConfig.getInt("tmt.tcs.mcs.cmdtimeout")[0m
+[0m[[0m[33mwarn[0m] [0m[0m        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/LifeCycleActor.scala:70:9: local val numberOfRetries in method doInitialize is never used[0m
+[0m[[0m[33mwarn[0m] [0m[0m    val numberOfRetries = assemblyConfig.getInt("tmt.tcs.mcs.retries")[0m
+[0m[[0m[33mwarn[0m] [0m[0m        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/LifeCycleActor.scala:71:9: local val velAccLimit in method doInitialize is never used[0m
+[0m[[0m[33mwarn[0m] [0m[0m    val velAccLimit     = assemblyConfig.getInt("tmt.tcs.mcs.limit")[0m
+[0m[[0m[33mwarn[0m] [0m[0m        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/McsAssemblyHandlers.scala:156:40: postfix operator seconds should be enabled[0m
+[0m[[0m[33mwarn[0m] [0m[0mby making the implicit value scala.language.postfixOps visible.[0m
+[0m[[0m[33mwarn[0m] [0m[0m    implicit val duration: Timeout = 4 seconds[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                       ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/McsAssemblyHandlers.scala:171:40: postfix operator seconds should be enabled[0m
+[0m[[0m[33mwarn[0m] [0m[0mby making the implicit value scala.language.postfixOps visible.[0m
+[0m[[0m[33mwarn[0m] [0m[0m    implicit val duration: Timeout = 4 seconds[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                       ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/McsAssemblyHandlers.scala:196:40: postfix operator seconds should be enabled[0m
+[0m[[0m[33mwarn[0m] [0m[0mby making the implicit value scala.language.postfixOps visible.[0m
+[0m[[0m[33mwarn[0m] [0m[0m    implicit val duration: Timeout = 1 seconds[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                       ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/McsAssemblyHandlers.scala:236:45: postfix operator seconds should be enabled[0m
+[0m[[0m[33mwarn[0m] [0m[0mby making the implicit value scala.language.postfixOps visible.[0m
+[0m[[0m[33mwarn[0m] [0m[0m        implicit val duration: Timeout = 20 seconds[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                            ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/McsAssemblyHandlers.scala:268:45: postfix operator seconds should be enabled[0m
+[0m[[0m[33mwarn[0m] [0m[0mby making the implicit value scala.language.postfixOps visible.[0m
+[0m[[0m[33mwarn[0m] [0m[0m        implicit val duration: Timeout = 10 seconds[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                            ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/McsAssemblyHandlers.scala:10:42: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                         ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/McsAssemblyHandlers.scala:30:94: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport org.tmt.tcs.mcs.MCSassembly.EventMessage.{hcdLocationChanged, StartEventSubscription, StartPublishingDummyEvent}[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                                             ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/MonitorActor.scala:12:63: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport org.tmt.tcs.mcs.MCSassembly.Constants.{EventConstants, EventHandlerConstants}[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/MonitorActor.scala:142:15: private method processMCSCurrentPositionEvent in class MonitorActor is never used[0m
+[0m[[0m[33mwarn[0m] [0m[0m  private def processMCSCurrentPositionEvent(currentState: CurrentState): Unit = {}[0m
+[0m[[0m[33mwarn[0m] [0m[0m              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/MoveCommandActor.scala:34:39: postfix operator seconds should be enabled[0m
+[0m[[0m[33mwarn[0m] [0m[0mby making the implicit value scala.language.postfixOps visible.[0m
+[0m[[0m[33mwarn[0m] [0m[0m  implicit val duration: Timeout = 20 seconds[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                      ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/MoveCommandActor.scala:3:26: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport akka.actor.Status.Success[0m
+[0m[[0m[33mwarn[0m] [0m[0m                         ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/MoveCommandActor.scala:15:42: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                         ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/EventHandlerActor.scala:116:5: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ObserveEvent(_, _, _, _, _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    msg match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m    ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/McsAssemblyHandlers.scala:178:13: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: Cancelled(_), Invalid(_, _), Locked(_), Started(_)[0m
+[0m[[0m[33mwarn[0m] [0m[0m        msg.submitResponse match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m            ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/MoveCommandActor.scala:61:18: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: Cancelled(_), CompletedWithResult(_, _), Error(_, _), Invalid(_, _), Locked(_), Started(_)[0m
+[0m[[0m[33mwarn[0m] [0m[0m        submitAll(0) match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/tmt_tcs_1/tcs/tcs-vslice-0.3/mcs-assembly/src/main/scala/org/tmt/tcs/mcs/MCSassembly/MoveCommandActor.scala:64:18: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: Cancelled(_), CompletedWithResult(_, _), Error(_, _), Invalid(_, _), Locked(_), Started(_)[0m
+[0m[[0m[33mwarn[0m] [0m[0m        submitAll(1) match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m30 warnings found[0m

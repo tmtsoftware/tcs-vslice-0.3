@@ -1,0 +1,28 @@
+[0m[[0m[0mdebug[0m] [0m[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial source changes: [0m
+[0m[[0m[0mdebug[0m] [0m[0m	removed:Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	added: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	modified: Set(/home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/pkassembly/JPkEventHandlerActor.java)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInvalidated products: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mExternal API changes: API Changes: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mModified binary dependencies: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial directly invalidated classes: Set(org.tmt.tcs.pk.pkassembly.JPkEventHandlerActor.McsDemandMessage, org.tmt.tcs.pk.pkassembly.JPkEventHandlerActor.EventMessage, org.tmt.tcs.pk.pkassembly.JPkEventHandlerActor.M3DemandMessage, org.tmt.tcs.pk.pkassembly.JPkEventHandlerActor, org.tmt.tcs.pk.pkassembly.JPkEventHandlerActor.EncDemandMessage)[0m
+[0m[[0m[0mdebug[0m] [0m[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0mSources indirectly invalidated by:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	product: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	binary dep: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	external source: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll initially invalidated classes: Set(org.tmt.tcs.pk.pkassembly.JPkEventHandlerActor.McsDemandMessage, org.tmt.tcs.pk.pkassembly.JPkEventHandlerActor.EventMessage, org.tmt.tcs.pk.pkassembly.JPkEventHandlerActor.M3DemandMessage, org.tmt.tcs.pk.pkassembly.JPkEventHandlerActor, org.tmt.tcs.pk.pkassembly.JPkEventHandlerActor.EncDemandMessage)[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll initially invalidated sources:Set(/home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/pkassembly/JPkEventHandlerActor.java)[0m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 1 Java source to /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/target/scala-2.12/classes ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mAttempting to call com.sun.tools.javac.api.JavacTool@363b41a0 directly...[0m
+[0m[[0m[0mdebug[0m] [0m[0mJava compilation took 1.162104043 s[0m
+[0m[[0m[0mdebug[0m] [0m[0mJava analysis took 0.183516819 s[0m
+[0m[[0m[0mdebug[0m] [0m[0mJava compilation + analysis took 1.352908266 s[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[0m[[0m[0mdebug[0m] [0m[0mNew invalidations:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial set of included nodes: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mPreviously invalidated, but (transitively) depend on new invalidations:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll newly invalidated classes after taking into account (previously) recompiled classes:Set()[0m

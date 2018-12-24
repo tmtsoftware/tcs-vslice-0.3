@@ -1,0 +1,25 @@
+[0m[[0m[0minfo[0m] [0m[0mPackaging /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/target/scala-2.12/pk-assembly_2.12-0.0.1-sources.jar ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mInput file mappings:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/wrapper/TpkPoc.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/wrapper/TpkPoc.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/pkassembly/JPkLifecycleActor.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/pkassembly/JPkLifecycleActor.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/pkassembly/SetTargetCmdActor.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/pkassembly/SetTargetCmdActor.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/wrapper/IDemandsCB.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/wrapper/IDemandsCB.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/pkassembly/JPkAssemblyHandlers.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/pkassembly/JPkAssemblyHandlers.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/wrapper/exampleJNI.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/wrapper/exampleJNI.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/pkassembly/JPkEventHandlerActor.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/pkassembly/JPkEventHandlerActor.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/pkassembly/JPkAssemblyBehaviorFactory.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/pkassembly/JPkAssemblyBehaviorFactory.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/wrapper/TpkWrapper.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/wrapper/TpkWrapper.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/wrapper/example.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/wrapper/example.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	org/tmt/tcs/pk/pkassembly/JPkCommandHandlerActor.java[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/tmt_tcs_1/tcs/tcs-vslice-0.3/pk-assembly/src/main/java/org/tmt/tcs/pk/pkassembly/JPkCommandHandlerActor.java[0m
+[0m[[0m[0minfo[0m] [0m[0mDone packaging.[0m

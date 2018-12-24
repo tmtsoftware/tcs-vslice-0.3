@@ -1,0 +1,7 @@
+Known responsibilities which needs to be taken care somewhere in design pattern are
+    * Handling socket connection
+    * managing sync between command socket and command response socket
+    * Mapping error code to csw command responses
+    * Mapping subsystem response to csw command response parameter
+    * Conversion of csw command parameter to protocol specific format for ex. binary.
+    * manage chunks/parts of binary stream if required.

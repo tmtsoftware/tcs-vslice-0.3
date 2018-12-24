@@ -1,0 +1,18 @@
+This directory contains the C code that makes up the shared library used by the java native class ABPlcioMaster.java in parent directory.
+
+The code in this directory has the following external dependencies.  
+Header files:
+	plc.h
+Libraries:
+	plc plccip plcvemcs
+
+The Makefile in this directory assumes the following locations for the external dependencies.
+External dependencies plc.h, plc and plccip are contained and installed from the package idom.
+Library plcvemcs is contained and installed from ecs/vemcs/plciovemcs.
+Header files:
+	$ATST/src/c++/include/idom
+	$ATST/src/c++/include/ecs
+Libraries:
+	$ATST/lib/c++/$ARCHNAME/idom
+	$ATST/lib/c++/$ARCHNAME/ecs
+
