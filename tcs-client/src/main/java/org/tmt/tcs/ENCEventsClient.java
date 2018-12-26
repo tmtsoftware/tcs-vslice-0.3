@@ -56,9 +56,10 @@ public class ENCEventsClient {
             this.locationService = locationService;
             this.eventService = getEventServiceInstance(locationService, system);
 
-            File file = new File("CurrentPosition_SimpleSimulator_Logs_"+Instant.now().toString()+"__.txt");
+            File file = new File("ENC_CurrentPosition_SimpleSimulator_Logs_"+Instant.now().toString()+"__.txt");
             file.createNewFile();
             this.printStream = new PrintStream(new FileOutputStream(file));
+            this.printStream.println("Simulator publish timestamp, HCD receive timestamp, Assembly receive timestamp, Client App timestamp");
         }
         /**
          * Use this method to get an instance of EventService

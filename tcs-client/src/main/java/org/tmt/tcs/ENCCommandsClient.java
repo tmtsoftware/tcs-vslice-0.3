@@ -54,6 +54,7 @@ public class ENCCommandsClient {
     public static ILogger log;
     Optional<ICommandService> commandServiceOptional;
     IEventService eventService;
+    PkClient pkClient;
 
     PrintStream printStream;
 
@@ -62,6 +63,7 @@ public class ENCCommandsClient {
         this.system = system;
         this.locationService = locationService;
         commandServiceOptional = getAssemblyBlocking();
+        pkClient   = new PkClient(new Prefix("tcs.pk"), system, locationService);
         File file = new File("Commmands_SimpleSimulator_Logs_"+Instant.now().toString()+"__.txt");
         file.createNewFile();
         this.printStream = new PrintStream(new FileOutputStream(file));
@@ -289,6 +291,7 @@ public class ENCCommandsClient {
         LoggingSystem loggingSystem = JLoggingSystemFactory.start("ENCCommandsClient", "0.1", hostName, system);
         log = new JLoggerFactory("client-app").getLogger(ENCCommandsClient.class);
 
+       // JLoggingSystemFactory.start("client-app", "0.1", hostName, system);
         log.info(() -> "TCS Client Starting..");
 
         boolean keepRunning = true;
@@ -339,6 +342,11 @@ public class ENCCommandsClient {
                     encClient.takeCommandMeasures();
                     log.info("Performance measure test completed");
                     break;
+                case "takeEventMeasures":
+                    log.info(() -> "Starting command performance test");
+                    encClient.takeEventMeasures();
+                    log.info("Performance measure test completed");
+                    break;
                 case "exit":
                     keepRunning = false;
                     break;
@@ -384,6 +392,19 @@ public class ENCCommandsClient {
                     + ", Time taken by HCD command(ms)=" + hcdCommandDuration.toMillis()
                     + ", Time taken by shutdown command(ms)=" + shutdownCommandDuration.toMillis());
         }
+    }
+
+    private CommandResponse startPkPositionDemands() throws Exception {
+        Optional<ObsId> maybeObsId          = Optional.empty();
+        CompletableFuture<CommandResponse.SubmitResponse> cf1 = pkClient.setTarget(maybeObsId, 185.79, 6.753333);
+        CommandResponse resp1 = cf1.get();
+        System.out.println("Inside PkClientApp: setTarget response is: " + resp1);
+        return resp1;
+    }
+    private void takeEventMeasures() throws Exception {
+            CommandResponse startUpCmdResponse = this.startup(Optional.empty()).get();
+            CommandResponse pkSetTargetResponse = this.startPkPositionDemands();
+
     }
 }
 
