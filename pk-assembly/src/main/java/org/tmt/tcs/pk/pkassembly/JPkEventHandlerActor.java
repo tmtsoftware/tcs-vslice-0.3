@@ -103,8 +103,8 @@ public class JPkEventHandlerActor extends AbstractBehavior<JPkEventHandlerActor.
         log.info("Inside JPkEventHandlerActor: Publishing Enc Demand ");
         Key<Double> baseDoubleKey = JKeyType.DoubleKey().make("ecs.base");
         Key<Double> capDoubleKey = JKeyType.DoubleKey().make("ecs.cap");
-
-        Event event = new SystemEvent(prefix, new EventName("encdemandpositions")).add(baseDoubleKey.set(message.getBase())).add(capDoubleKey.set(message.getCap()));
+        Key<Instant>  publishTimeKey             = JKeyType.TimestampKey().make("clientTimestampKey");
+        Event event = new SystemEvent(prefix, new EventName("encdemandpositions")).add(baseDoubleKey.set(message.getBase())).add(capDoubleKey.set(message.getCap())).add(publishTimeKey.set(Instant.now()));
 
         eventService.defaultPublisher().publish(event);
 
