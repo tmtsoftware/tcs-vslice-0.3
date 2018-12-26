@@ -146,7 +146,7 @@ public class JEventHandlerActor extends AbstractBehavior<JEventHandlerActor.Even
 
         Parameter baseParam = event.paramSet().find(x -> x.keyName().equals(DEMAND_POSITIONS_BASE_KEY)).get();
         Parameter capParam = event.paramSet().find(x -> x.keyName().equals(DEMAND_POSITIONS_CAP_KEY)).get();
-        Parameter<Instant> clientTimeParam = CLIENT_TIMESTAMP_KEY.set(event.eventTime().time());
+        Parameter clientTimeParam = event.paramSet().find(x -> x.keyName().equals(CLIENT_TIMESTAMP_KEY_STRING)).get();
         Parameter<Instant> assemblyTimeParam = ASSEMBLY_TIMESTAMP_KEY.set(Instant.now());
         CurrentState demandPosition = new CurrentState(this.cswCtx.componentInfo().prefix(), new StateName(DEMAND_POSITIONS))
                 .add(baseParam)

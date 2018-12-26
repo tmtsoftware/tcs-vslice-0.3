@@ -40,6 +40,7 @@ public class Constants {
     public static final String DEMAND_POSITIONS = "encdemandpositions";
     public static final String DEMAND_POSITIONS_BASE_KEY = "ecs.base";
     public static final String DEMAND_POSITIONS_CAP_KEY = "ecs.cap";
+    public static final String CLIENT_TIMESTAMP_KEY_STRING = "clientTimestampKey";
 
 
 
