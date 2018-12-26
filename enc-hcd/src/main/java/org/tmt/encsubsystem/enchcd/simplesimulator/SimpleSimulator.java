@@ -31,15 +31,18 @@ public class SimpleSimulator {
     private PrintStream printStream;
 
     private SimpleSimulator() {
-        this.currentPosition = new CurrentPosition(0.12, 0.06, Instant.now().toEpochMilli());
+        this.currentPosition = new CurrentPosition(0.12, 0.06, Instant.now());
         this.demandPosition = new DemandPosition(0.0,0.0, Instant.now(), Instant.now(), Instant.now());
         this.health = new Health(Health.HealthType.GOOD, "good", Instant.now().toEpochMilli());
         Byte[] dummyData = {5,6,7,8,9,5,3,2,1,2,3,5,6,7,8};
         this.diagnostic = new Diagnostic(dummyData, Instant.now().toEpochMilli());
         try {
-            File file = new File("DemandPosition_SimpleSimulator_Logs_"+Instant.now().toString()+"__.txt");
-            file.createNewFile();
+            File file = new File("ENC_DemandPosition_SimpleSimulator_Logs_"+Instant.now().toString()+"__.txt");
+            boolean created = file.createNewFile();
+            System.out.println("file created - "  +created);
             this.printStream = new PrintStream(new FileOutputStream(file));
+            this.printStream.println("PK publish Timestamp, Assembly receive timestamp, hcd receive timestamp, simulator receive timestamp");
+            System.out.println("ok");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -130,7 +133,7 @@ public class SimpleSimulator {
      */
     public FollowCommand.Response sendCommand(FollowCommand cmd) {
         System.out.println("follow command - " +cmd);
-        this.currentPosition = new CurrentPosition(demandPosition.getBase(), demandPosition.getCap(), Instant.now().toEpochMilli());
+        this.currentPosition = new CurrentPosition(demandPosition.getBase(), demandPosition.getCap(), Instant.now());
         FollowCommand.Response response= new FollowCommand.Response();
         response.setDesc("Completed");
         response.setStatus(FollowCommand.Response.Status.OK);
@@ -143,7 +146,7 @@ public class SimpleSimulator {
      * @return
      */
     public CurrentPosition getCurrentPosition() {
-        currentPosition.setTime(Instant.now().toEpochMilli());
+        currentPosition.setTime(Instant.now());
         return currentPosition;
     }
 
@@ -173,7 +176,7 @@ public class SimpleSimulator {
         long assemblyToHcdDuration = Duration.between(demandPosition.getAssemblyTime(), demandPosition.getHcdTime()).toNanos();
         //this.printStream.println("Event=Demand Position "+", "+ "Base="+demandPosition.getBase() + ", "+ "Cap="+demandPosition.getCap() + ", " + "Pointing Kernel Time="+demandPosition.getClientTime() + ", " +"Assembly Time=" + demandPosition.getAssemblyTime()+ ", " +"HCD Time="+ demandPosition.getHcdTime() + ", " + "Subsystem Time ="+ subsystemTime + ", " + "Duration(PKA to ENCA in ms)= "+ clientToAssemblyDuration + ", " + "Duration(PKA to HCD in ms)= "+ clientToHcdDuration + ", " + "Duration(PKA to Subsystem in ms) = "+ clientTosubsystemDuration + ", " + "Duration(Assembly to HCD in ms)= " + assemblyToHcdDuration);
         this.printStream.println(demandPosition.getClientTime() + ", " + demandPosition.getAssemblyTime()+ ", " + demandPosition.getHcdTime() + ", " + subsystemTime);
-        System.out.println("Event=Demand Position "+", "+ "Base="+demandPosition.getBase() + ", "+ "Cap="+demandPosition.getCap() + ", " + "Pointing Kernel Time="+demandPosition.getClientTime() + ", " +"Assembly Time=" + demandPosition.getAssemblyTime()+ ", " +"HCD Time="+ demandPosition.getHcdTime() + ", " + "Subsystem Time ="+ subsystemTime + ", " + "Duration(PKA to ENCA in ms)= "+ clientToAssemblyDuration + ", " + "Duration(PKA to HCD in ms)= "+ clientToHcdDuration + ", " + "Duration(PKA to Subsystem in ms) = "+ clientTosubsystemDuration + ", " + "Duration(Assembly to HCD in ms)= " + assemblyToHcdDuration);
+      //  System.out.println("Event=Demand Position "+", "+ "Base="+demandPosition.getBase() + ", "+ "Cap="+demandPosition.getCap() + ", " + "Pointing Kernel Time="+demandPosition.getClientTime() + ", " +"Assembly Time=" + demandPosition.getAssemblyTime()+ ", " +"HCD Time="+ demandPosition.getHcdTime() + ", " + "Subsystem Time ="+ subsystemTime + ", " + "Duration(PKA to ENCA in ms)= "+ clientToAssemblyDuration + ", " + "Duration(PKA to HCD in ms)= "+ clientToHcdDuration + ", " + "Duration(PKA to Subsystem in ms) = "+ clientTosubsystemDuration + ", " + "Duration(Assembly to HCD in ms)= " + assemblyToHcdDuration);
 
     }
 }

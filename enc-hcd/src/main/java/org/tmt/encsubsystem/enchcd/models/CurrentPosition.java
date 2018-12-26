@@ -1,13 +1,15 @@
 package org.tmt.encsubsystem.enchcd.models;
 
+import java.time.Instant;
+
 /**
  * This is a POJO Class to represent current position of enclosure.
  */
 public class CurrentPosition {
     private double base, cap;
-    private long time;
+    private Instant time;
 
-    public CurrentPosition(double base, double cap, long time) {
+    public CurrentPosition(double base, double cap, Instant time) {
         this.base = base;
         this.cap = cap;
         this.time = time;
@@ -38,11 +40,11 @@ public class CurrentPosition {
         this.cap = cap;
     }
 
-    public long getTime() {
+    public Instant getTime() {
         return time;
     }
 
-    public void setTime(long time) {
+    public void setTime(Instant time) {
         this.time = time;
     }
 }

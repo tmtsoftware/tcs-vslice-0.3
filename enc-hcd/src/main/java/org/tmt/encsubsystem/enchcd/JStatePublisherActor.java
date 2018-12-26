@@ -83,6 +83,10 @@ public class JStatePublisherActor extends AbstractBehavior<JStatePublisherActor.
 
     private HCDState hcdState;
 
+    private int counterCurrentPos = 0;
+    private static final int LIMIT =100000;
+    private static final boolean IS_LONG_RUNNING_MODE = false;
+
 
     private JStatePublisherActor(TimerScheduler<StatePublisherMessage> timer, JCswContext cswCtx, HCDState hcdState) {
         this.timer = timer;
@@ -111,6 +115,7 @@ public class JStatePublisherActor extends AbstractBehavior<JStatePublisherActor.
                 .onMessage(StartMessage.class,
                         command -> {
                             log.debug(() -> "StartMessage Received");
+                            counterCurrentPos=0;
                             onStart(command);
                             return Behaviors.same();
                         })
@@ -145,6 +150,14 @@ public class JStatePublisherActor extends AbstractBehavior<JStatePublisherActor.
                         publishCurrentPositionMessage -> {
                             log.debug(() -> "PublishCurrentPositionMessage Received");
                             publishCurrentPosition();
+                            if(IS_LONG_RUNNING_MODE){
+
+                            }else if(counterCurrentPos<LIMIT){
+                                counterCurrentPos++;
+                            }else {
+                                counterCurrentPos=0;
+                                onStop(new JStatePublisherActor.StopMessage());
+                            }
                             return Behaviors.same();
                         })
                 .onMessage(PublishHealthMessage.class,
@@ -174,6 +187,7 @@ public class JStatePublisherActor extends AbstractBehavior<JStatePublisherActor.
      * @return
      */
     private Behavior<StatePublisherMessage> handleInitializedMessage(InitializedMessage message) {
+        onStart(new JStatePublisherActor.StartMessage());
         this.hcdState.setLifecycleState(HCDState.LifecycleState.Running);
         this.hcdState.setOperationalState(HCDState.OperationalState.Ready);
         return Behaviors.same();
@@ -185,6 +199,7 @@ public class JStatePublisherActor extends AbstractBehavior<JStatePublisherActor.
      * @return
      */
     private Behavior<StatePublisherMessage> handleUnInitializedMessage(UnInitializedMessage message) {
+        onStop(new JStatePublisherActor.StopMessage());
         this.hcdState.setLifecycleState(HCDState.LifecycleState.Initialized);
         this.hcdState.setOperationalState(HCDState.OperationalState.Idle);
         return Behaviors.same();
@@ -282,7 +297,7 @@ public class JStatePublisherActor extends AbstractBehavior<JStatePublisherActor.
         Parameter<Double> basePosParam = BASE_POS_KEY.set(currentPosition.getBase()).withUnits(JUnits.degree);
         Parameter<Double> capPosParam = CAP_POS_KEY.set(currentPosition.getCap()).withUnits(JUnits.degree);
         //this is the time when subsystem published current position.
-        Parameter<Instant> ecsSubsystemTimestampParam = SUBSYSTEM_TIMESTAMP_KEY.set(Instant.ofEpochMilli(currentPosition.getTime()));
+        Parameter<Instant> ecsSubsystemTimestampParam = SUBSYSTEM_TIMESTAMP_KEY.set(currentPosition.getTime());
         //this is the time when ENC HCD processed current position
         Parameter<Instant> encHcdTimestampParam = HCD_TIMESTAMP_KEY.set(Instant.now());
 

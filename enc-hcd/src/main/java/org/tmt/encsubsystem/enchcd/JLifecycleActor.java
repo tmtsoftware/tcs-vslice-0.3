@@ -104,7 +104,7 @@ public class JLifecycleActor extends AbstractBehavior<JLifecycleActor.LifecycleM
         String ethernetaddress = assemblyConfig.getString("ethernetaddress");
 
         log.debug(() -> "ethernetaddress config element value is: " + ethernetaddress);
-        statePublisherActor.tell(new JStatePublisherActor.StartMessage());
+     //   statePublisherActor.tell(new JStatePublisherActor.StartMessage());
         message.cf.complete(null);
 
     }
