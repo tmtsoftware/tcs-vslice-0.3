@@ -13,7 +13,11 @@ object EventConstants {
   val POINTING_KERNEL_AZ_POS: String    = "mcs.az"
   val POINTING_KERNEL_EL_POS: String    = "mcs.el"
 
-  val PositionDemandKey: Set[EventKey] = Set(EventKey(Prefix(TPK_PREFIX), EventName(MOUNT_DEMAND_POSITION)))
+  // val PositionDemandKey: Set[EventKey] = Set(EventKey(Prefix(TPK_PREFIX), EventName(MOUNT_DEMAND_POSITION)))
+
+  val ASSEMBLY_POSDEMANDS_PREFIX               = new Prefix("tcs.mcsA")
+  val ASSEMBLY_POSDEMANDS_EVENT                = new EventName("mcsA_demandpositions")
+  val AssemblyPositionDemandKey: Set[EventKey] = Set(EventKey(ASSEMBLY_POSDEMANDS_PREFIX, ASSEMBLY_POSDEMANDS_EVENT))
 
   val TrackIDKey: Key[Int]  = KeyType.IntKey.make(POITNTING_KERNEL_TRACK_ID)
   val AzPosKey: Key[Double] = KeyType.DoubleKey.make(POINTING_KERNEL_AZ_POS)

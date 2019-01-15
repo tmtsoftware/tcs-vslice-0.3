@@ -1,5 +1,8 @@
 package org.tmt.tcs.mcs.MCSassembly
 
+import java.io.{File, FileOutputStream, PrintStream}
+import java.time.{Instant, LocalDateTime, ZoneId}
+
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
@@ -31,17 +34,17 @@ import org.tmt.tcs.mcs.MCSassembly.EventMessage.{hcdLocationChanged, StartEventS
 import org.tmt.tcs.mcs.MCSassembly.msgTransformer.EventTransformerHelper
 
 /**
- * Domain specific logic should be written in below handlers.
- * This handlers gets invoked when component receives messages/commands from other component/entity.
- * For example, if one component sends Submit(Setup(args)) command to McsHcd,
- * This will be first validated in the supervisor and then forwarded to Component TLA which first invokes validateCommand hook
- * and if validation is successful, then onSubmit hook gets invoked.
- * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
- */
+  * Domain specific logic should be written in below handlers.
+  * This handlers gets invoked when component receives messages/commands from other component/entity.
+  * For example, if one component sends Submit(Setup(args)) command to McsHcd,
+  * This will be first validated in the supervisor and then forwarded to Component TLA which first invokes validateCommand hook
+  * and if validation is successful, then onSubmit hook gets invoked.
+  * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
+  */
 class McsAssemblyHandlers(
-    ctx: ActorContext[TopLevelActorMessage],
-    cswCtx: CswContext
-) extends ComponentHandlers(ctx, cswCtx: CswContext) {
+                           ctx: ActorContext[TopLevelActorMessage],
+                           cswCtx: CswContext
+                         ) extends ComponentHandlers(ctx, cswCtx: CswContext) {
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
@@ -58,20 +61,26 @@ class McsAssemblyHandlers(
 
   val eventHandlerActor: ActorRef[EventMessage] =
     ctx.spawn(EventHandlerActor.createObject(eventService, hcdLocation, eventTransformer, currentStatePublisher, loggerFactory),
-              name = "EventHandlerActor")
+      name = "EventHandlerActor")
 
   val monitorActor: ActorRef[MonitorMessage] = ctx.spawn(
     MonitorActor.createObject(AssemblyLifeCycleState.Initalized,
-                              AssemblyOperationalState.Ready,
-                              eventHandlerActor,
-                              eventTransformer,
-                              loggerFactory),
+      AssemblyOperationalState.Ready,
+      eventHandlerActor,
+      eventTransformer,
+      loggerFactory),
     name = "MonitorActor"
   )
   val commandHandlerActor: ActorRef[CommandMessage] = ctx.spawn(
     CommandHandlerActor.createObject(commandResponseManager, isOnline = true, hcdLocation, loggerFactory),
     "CommandHandlerActor"
   )
+  val logFilePath: String = System.getenv("LogFiles")
+  /*val AssemblyCmdFile: File = new File(logFilePath + "/Cmd_Assembly" + System.currentTimeMillis() + "_.txt")
+  AssemblyCmdFile.createNewFile()
+  var cmdCounter: Long            = 0
+  val cmdPrintStream: PrintStream = new PrintStream(new FileOutputStream(AssemblyCmdFile))
+  this.cmdPrintStream.println("AssemblyReciveTimestamp")*/
 
   /*
   This function is CSW in built initalization function
@@ -82,8 +91,6 @@ class McsAssemblyHandlers(
   override def initialize(): Future[Unit] = Future {
     log.info(msg = "Initializing MCS Assembly")
     lifeCycleActor ! InitializeMsg()
-    //eventHandlerActor ! StartPublishingDummyEvent()
-    eventHandlerActor ! StartEventSubscription()
     monitorActor ! AssemblyLifeCycleStateChangeMsg(AssemblyLifeCycleState.Initalized)
   }
   /*
@@ -111,11 +118,9 @@ class McsAssemblyHandlers(
     commandHandlerActor ! updateHCDLocation(hcdLocation)
     log.error(s"Sending hcdLocation:$hcdLocation to eventHandlerActor")
     eventHandlerActor ! hcdLocationChanged(hcdLocation)
-    eventHandlerActor ! StartEventSubscription()
   }
 
   override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
-    log.info(msg = s" validating command ----> ${controlCommand.commandName}")
     controlCommand.commandName.name match {
 
       case Commands.FOLLOW              => validateFollowCommand(controlCommand)
@@ -126,6 +131,7 @@ class McsAssemblyHandlers(
       case Commands.STARTUP             => Accepted(controlCommand.runId)
       case Commands.SHUTDOWN            => Accepted(controlCommand.runId)
       case Commands.SET_SIMULATION_MODE => Accepted(controlCommand.runId)
+      case Commands.READCONFIGURATION   => Accepted(controlCommand.runId)
       case x                            => Invalid(controlCommand.runId, UnsupportedCommandIssue(s"Command $x is not supported"))
     }
   }
@@ -254,14 +260,13 @@ class McsAssemblyHandlers(
         }
       case false =>
         CommandResponse.Invalid(controlCommand.runId,
-                                WrongNumberOfParametersIssue(s" axes parameter is not provided for move command"))
+          WrongNumberOfParametersIssue(s" axes parameter is not provided for move command"))
     }
   }
   /*
   This function validates datum command based on parameters and state
    */
   private def validateDatumCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
-    // check hcd is in running state
     val validateParamsBool: Boolean = validateParams(controlCommand)
     validateParamsBool match {
       case true =>
@@ -284,14 +289,23 @@ class McsAssemblyHandlers(
       case false =>
         log.error(s"Incorrect parameters provided for Datum command ")
         CommandResponse.Invalid(controlCommand.runId,
-                                WrongNumberOfParametersIssue(s" axes parameter is not provided for datum command"))
+          WrongNumberOfParametersIssue(s" axes parameter is not provided for datum command"))
     }
   }
+  def getDate(instant: Instant) = LocalDateTime.ofInstant(instant, ZoneId.of(Commands.zoneFormat)).format(Commands.formatter)
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName.name match {
-      case Commands.FOLLOW              => executeFollowCommandAndSendResponse(controlCommand)
+      case Commands.STARTUP =>
+        eventHandlerActor ! StartEventSubscription()
+        commandHandlerActor ! submitCommandMsg(controlCommand)
+        Started(controlCommand.runId)
       case Commands.SET_SIMULATION_MODE => executeSimModeAndSendResp(controlCommand)
+      case Commands.READCONFIGURATION   =>
+        // this.cmdPrintStream.println(getDate(Instant.now()).trim)
+        commandHandlerActor ! submitCommandMsg(controlCommand)
+        Started(controlCommand.runId)
+      case Commands.FOLLOW => executeFollowCommandAndSendResponse(controlCommand)
       case _ =>
         commandHandlerActor ! submitCommandMsg(controlCommand)
         Started(controlCommand.runId)

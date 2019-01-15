@@ -1,8 +1,8 @@
 package org.tmt.tcs.mcs.MCShcd.msgTransformers
 import java.time.Instant
 
-import com.google.protobuf.Timestamp
-import csw.logging.scaladsl.LoggerFactory
+import com.google.protobuf.{ExtensionRegistryLite, Timestamp}
+import csw.logging.scaladsl.{noId, LoggerFactory}
 import csw.params.commands.ControlCommand
 import csw.params.core.generics.Parameter
 import csw.params.core.states.CurrentState
@@ -34,8 +34,17 @@ case class ProtoBuffMsgTransformer(loggerFactory: LoggerFactory) extends IMessag
   override def decodeEvent(eventName: String, encodedEventData: Array[Byte]): CurrentState = {
     eventName match {
       case EventConstants.CURRENT_POSITION =>
-        val mcsCurrentPosEvent: McsCurrentPositionEvent = McsCurrentPositionEvent.parseFrom(encodedEventData)
-        paramSetTransformer.getMountCurrentPosition(mcsCurrentPosEvent)
+        var mcsCurrentPosEvent: McsCurrentPositionEvent = null
+        // log.error(s"Decoding event: $eventName for data: $encodedEventData")
+        try {
+          mcsCurrentPosEvent = McsCurrentPositionEvent.parseFrom(encodedEventData)
+          paramSetTransformer.getMountCurrentPosition(mcsCurrentPosEvent)
+        } catch {
+          case e: Exception =>
+            log.error("Exception while getting current position", Map.empty, e, noId)
+            e.printStackTrace()
+            null
+        }
       case EventConstants.DIAGNOSIS_STATE =>
         val diagnosis: MountControlDiags = MountControlDiags.parseFrom(encodedEventData)
         paramSetTransformer.getMountControlDignosis(diagnosis)
@@ -45,22 +54,15 @@ case class ProtoBuffMsgTransformer(loggerFactory: LoggerFactory) extends IMessag
       case EventConstants.HEALTH_STATE =>
         var healthState: McsHealth = null
         try {
+          // log.error(s"Decoding event: $eventName for data: $encodedEventData")
           healthState = McsHealth.parseFrom(encodedEventData)
+          paramSetTransformer.getMCSHealth(healthState)
         } catch {
           case e: Exception =>
+            log.error("Exception while getting health event", Map.empty, e, noId)
             e.printStackTrace()
-            val instant = Instant.now()
-            val timestamp: com.google.protobuf.Timestamp =
-              Timestamp.newBuilder().setNanos(instant.getNano).setSeconds(instant.getEpochSecond).build()
-            healthState = McsHealth
-              .newBuilder()
-              .setHealth(McsHealth.Health.Good)
-              .setReason("All is well")
-              .setTime(timestamp)
-              .build()
-            log.error(s"Publishing dummy health from exception :$healthState")
+            null
         }
-        paramSetTransformer.getMCSHealth(healthState)
     }
 
   }
@@ -68,12 +70,13 @@ case class ProtoBuffMsgTransformer(loggerFactory: LoggerFactory) extends IMessag
   override def encodeMessage(controlCommand: ControlCommand): Array[Byte] = {
 
     controlCommand.commandName.name match {
-      case Commands.FOLLOW       => getFollowCommandBytes
-      case Commands.DATUM        => getDatumCommandBytes(controlCommand)
-      case Commands.POINT        => getPointCommandBytes(controlCommand)
-      case Commands.POINT_DEMAND => getPointDemandCommandBytes(controlCommand)
-      case Commands.STARTUP      => getStartupCommandBytes
-      case Commands.SHUTDOWN     => getShutdownCommandBytes
+      case Commands.FOLLOW            => getFollowCommandBytes
+      case Commands.DATUM             => getDatumCommandBytes(controlCommand)
+      case Commands.POINT             => getPointCommandBytes(controlCommand)
+      case Commands.POINT_DEMAND      => getPointDemandCommandBytes(controlCommand)
+      case Commands.STARTUP           => getStartupCommandBytes
+      case Commands.SHUTDOWN          => getShutdownCommandBytes
+      case Commands.READCONFIGURATION => getReadConfCmdBytes
     }
   }
   override def encodeCurrentState(currentState: CurrentState): Array[Byte] = {
@@ -144,7 +147,11 @@ case class ProtoBuffMsgTransformer(loggerFactory: LoggerFactory) extends IMessag
     event.toByteArray
 
   }
+  def getReadConfCmdBytes: Array[Byte] = {
+    val command: ReadConfiguration = ReadConfiguration.newBuilder().build()
+    command.toByteArray
 
+  }
   def getFollowCommandBytes: Array[Byte] = {
     val command: FollowCommand = FollowCommand.newBuilder().build()
     command.toByteArray

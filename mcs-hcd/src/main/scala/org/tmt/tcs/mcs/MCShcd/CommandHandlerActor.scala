@@ -4,21 +4,16 @@ import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import csw.command.client.CommandResponseManager
 import csw.logging.scaladsl.LoggerFactory
-import csw.params.commands.CommandResponse.{SubmitResponse, ValidateCommandResponse}
-import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.CommandResponse.SubmitResponse
+import csw.params.commands.ControlCommand
 import csw.params.core.generics.Parameter
 import org.tmt.tcs.mcs.MCShcd.constants.Commands
-import org.tmt.tcs.mcs.MCShcd.workers.{
-  DatumCmdActor,
-  FollowCmdActor,
-  PointCmdActor,
-  PointDemandCmdActor,
-  ShutdownCmdActor,
-  StartupCmdActor
-}
+import org.tmt.tcs.mcs.MCShcd.workers._
 
 import scala.concurrent.ExecutionContextExecutor
-import org.tmt.tcs.mcs.MCShcd.HCDCommandMessage.{submitCommand, ImmediateCommand, SimulatorMode}
+import org.tmt.tcs.mcs.MCShcd.HCDCommandMessage.{submitCommand, ImmediateCommand}
+import org.tmt.tcs.mcs.MCShcd.Protocol.SimpleSimMsg.ProcessCommand
+import org.tmt.tcs.mcs.MCShcd.Protocol.ZeroMQMessage.SubmitCommand
 import org.tmt.tcs.mcs.MCShcd.Protocol.{SimpleSimMsg, ZeroMQMessage}
 
 sealed trait HCDCommandMessage
@@ -27,7 +22,6 @@ object HCDCommandMessage {
   case class ImmediateCommandResponse(submitResponse: SubmitResponse)                              extends HCDCommandMessage
   case class submitCommand(controlCommand: ControlCommand)                                         extends HCDCommandMessage
   case class SimulatorMode(controlCommand: ControlCommand)                                         extends HCDCommandMessage
-
 }
 object CommandHandlerActor {
   def createObject(commandResponseManager: CommandResponseManager,
@@ -71,20 +65,29 @@ case class CommandHandlerActor(ctx: ActorContext[HCDCommandMessage],
     }
   }
   private def processImmediateCommand(immediateCommand: ImmediateCommand): Behavior[HCDCommandMessage] = {
-    immediateCommand.controlCommand.commandName.name match {
-
-      case Commands.FOLLOW =>
-        log.info("Received follow command in HCD commandHandler")
-        val followCmdActor: ActorRef[ImmediateCommand] =
-          ctx.spawn(FollowCmdActor.create(commandResponseManager, zeroMQProtoActor, simpleSimActor, simulatorMode, loggerFactory),
-                    name = "FollowCmdActor")
-        followCmdActor ! immediateCommand
-        Behavior.same
-
-    }
+    log.info("Received follow command in HCD commandHandler")
+    val followCmdActor: ActorRef[ImmediateCommand] = ctx.spawn(
+      FollowCmdActor.create(commandResponseManager, zeroMQProtoActor, simpleSimActor, simulatorMode, loggerFactory),
+      name = "FollowCmdActor"
+    )
+    followCmdActor ! immediateCommand
+    Behavior.same
   }
   private def processSubmitCommand(cmdMessage: submitCommand): Behavior[HCDCommandMessage] = {
     cmdMessage.controlCommand.commandName.name match {
+      case Commands.READCONFIGURATION =>
+        simulatorMode match {
+          case Commands.REAL_SIMULATOR =>
+            zeroMQProtoActor ! SubmitCommand(cmdMessage.controlCommand)
+          case Commands.SIMPLE_SIMULATOR =>
+            simpleSimActor ! ProcessCommand(cmdMessage.controlCommand)
+        }
+        Behavior.same
+      // log.info("Received readConf command in HCD commandHandler")
+      /* val readConfCmdActor: ActorRef[ControlCommand] = ctx.spawnAnonymous(
+    ReadConfCmdActor.create(commandResponseManager, zeroMQProtoActor, simpleSimActor, simulatorMode, loggerFactory)
+    )
+    readConfCmdActor ! cmdMessage.controlCommand*/
       case Commands.STARTUP =>
         log.info("Starting MCS HCD")
         val startupCmdActor: ActorRef[ControlCommand] = ctx.spawn(

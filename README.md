@@ -65,9 +65,45 @@ By default the mode is set to simple simulator. Varify and if required Edit and 
 `cd tcs-vsclice-0.2/tcs-client/target/universal/stage/bin`  
 `./pk-client-app`  
 
-
 In around 15-20 min you will see measurment data is generated at location specified using environment variable 'LogFiles'. This will be in csv format.
 Save the jconsole data as well.
 Stop all the services and redo above steps to take another set of measurements.
 
+### Scenario II  
+Single-Machine, Single Container with Real Simulator.  
 
+#### Step 1 - Start CSW services  
+`./csw-services.sh start`  
+
+#### JAVA 9  
+As Java 1.8 does not support time capturing in microsecond, before starting any assembly PK or MCS, switch to JRE 9 by modifying PATH variable. This is required only for deployment and build should be done with java 8.  
+`export PATH=/java-9-home-path-here/bin:$PATH`  
+
+#### Step 2 - Start Container having PK + MCS  
+`export PATH=/java-9-home-path-here/bin:$PATH`  
+`cd tcs-vsclice-0.3/tcs-deploy/target/universal/stage/bin`  
+`./mcs-pk-single-container-cmd-app --local ../../../../../tcs-deploy/src/main/resources/McsPkSingleContainer.conf`  
+ 
+#### Step 3 - Start Jconsole and connect to MCS Container process from it.
+`jconsole`  
+
+#### Step 4 - Start MCS Real Simulator  
+`cd tcs-vsclice-0.2/MCSSubsystem/`  
+`sbt compile package`  
+`export PATH=/java-9-home-path-here/bin:$PATH`  
+`sbt run`  
+
+#### Step 5 - Start Event generation in MCS  
+By default the mode is set to simple simulator. Varify and if required Edit and rebuild mcs-main-app before executing below commands to use simple simulator mode. 
+
+`export PATH=/java-9-home-path-here/bin:$PATH`  
+`cd tcs-vsclice-0.3/tcs-client/target/universal/stage/bin`  
+`./mcs-main-app`  
+
+#### Step 7 - Start Demand generation in PK  
+`cd tcs-vsclice-0.3/tcs-client/target/universal/stage/bin`  
+`./pk-client-app`  
+
+In around 15-20 min you will see measurment data is generated at location specified using environment variable 'LogFiles'. This will be in csv format.
+Save the jconsole data as well.
+Stop all the services and redo above steps to take another set of measurements.

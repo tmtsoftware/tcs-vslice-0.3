@@ -11,6 +11,9 @@ object EventHandlerConstants {
     EventKey(Prefix(EventConstants.TPK_PREFIX), EventName(EventConstants.MOUNT_DEMAND_POSITION))
   )
 
+  val ASSEMBLY_POSDEMANDS_PREFIX = new Prefix("tcs.mcsA")
+  val ASSEMBLY_POSDEMANDS_EVENT  = new EventName("mcsA_demandpositions")
+
   val mcsHCDPrefix = Prefix(Subsystem.MCS.toString)
 
   //These parameters are needed for assembly current state event generation

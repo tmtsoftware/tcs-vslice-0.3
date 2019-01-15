@@ -2,18 +2,13 @@ package org.tmt.tcs.mcs.MCShcd.workers
 
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
-import akka.util.Timeout
 import org.tmt.tcs.mcs.MCShcd.Protocol.{SimpleSimMsg, ZeroMQMessage}
-
-import scala.concurrent.duration._
-import akka.actor.typed.scaladsl.AskPattern._
 import csw.command.client.CommandResponseManager
 import csw.logging.scaladsl.{Logger, LoggerFactory}
-import csw.params.commands.CommandResponse.Completed
-import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.ControlCommand
+import org.tmt.tcs.mcs.MCShcd.Protocol.SimpleSimMsg.ProcessCommand
+import org.tmt.tcs.mcs.MCShcd.Protocol.ZeroMQMessage.SubmitCommand
 import org.tmt.tcs.mcs.MCShcd.constants.Commands
-
-import scala.concurrent.Await
 
 object StartupCmdActor {
   def create(commandResponseManager: CommandResponseManager,
@@ -36,20 +31,16 @@ case class StartupCmdActor(ctx: ActorContext[ControlCommand],
 
   override def onMessage(msg: ControlCommand): Behavior[ControlCommand] = {
     simulatorMode match {
-      case Commands.REAL_SIMULATOR => {
-        submitToRealSim(msg)
+      case Commands.REAL_SIMULATOR =>
+        zeroMQProtoActor ! SubmitCommand(msg)
         Behaviors.stopped
-      }
-      case Commands.SIMPLE_SIMULATOR => {
-        submitToSimpleSim(msg)
+      case Commands.SIMPLE_SIMULATOR =>
+        simpleSimActor ! ProcessCommand(msg)
         Behaviors.stopped
-      }
     }
-
-    Behavior.stopped
   }
   //TODO : Replace ask calls to simulator with commandResponseManager in simple and real simulator actors
-  private def submitToSimpleSim(msg: ControlCommand): Unit = {
+  /*private def submitToSimpleSim(msg: ControlCommand): Unit = {
     implicit val duration: Timeout = 2 seconds
     implicit val scheduler         = ctx.system.scheduler
     val response: SimpleSimMsg = Await.result(simpleSimActor ? { ref: ActorRef[SimpleSimMsg] =>
@@ -74,5 +65,5 @@ case class StartupCmdActor(ctx: ActorContext[ControlCommand],
           CommandResponse.Error(msg.runId, "Unable to submit command data to MCS subsystem from worker actor.")
         )
     }
-  }
+  }*/
 }

@@ -1,4 +1,5 @@
 package org.tmt.tcs.mcs.MCShcd.constants
+import java.time.format.DateTimeFormatter
 
 object Commands {
   val POINT        = "Point"
@@ -23,4 +24,7 @@ object Commands {
   val SIMULATION_MODE     = "SimulationMode"
   val REAL_SIMULATOR      = "RealSimulator"
   val SIMPLE_SIMULATOR    = "SimpleSimulator"
+
+  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+  val zoneFormat: String           = "UTC"
 }

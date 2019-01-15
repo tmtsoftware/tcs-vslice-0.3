@@ -1,4 +1,5 @@
 package org.tmt.tcs.mcs.MCSassembly.Constants
+import java.time.format.DateTimeFormatter
 
 object Commands {
   val AXIS                = "Axis"
@@ -19,4 +20,7 @@ object Commands {
   val DUMMY_IMMEDIATE     = "DummyImmediate"
   val DUMMY_LONG          = "DummyLong"
   val SET_SIMULATION_MODE = "setSimulationMode"
+
+  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+  val zoneFormat: String           = "UTC"
 }

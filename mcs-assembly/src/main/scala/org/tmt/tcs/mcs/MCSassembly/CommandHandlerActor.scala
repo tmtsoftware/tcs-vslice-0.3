@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import org.tmt.tcs.mcs.MCSassembly.CommandMessage._
 import org.tmt.tcs.mcs.MCSassembly.Constants.Commands
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
@@ -13,7 +13,8 @@ import csw.command.client.CommandResponseManager
 import csw.logging.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.{Error, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
-import csw.params.core.models.{Prefix, Subsystem}
+import csw.params.core.models.{Id, Prefix, Subsystem}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 sealed trait CommandMessage
 object CommandMessage {
@@ -42,7 +43,7 @@ case class CommandHandlerActor(ctx: ActorContext[CommandMessage],
                                isOnline: Boolean,
                                hcdLocation: Option[CommandService],
                                loggerFactory: LoggerFactory)
-    extends AbstractBehavior[CommandMessage] {
+  extends AbstractBehavior[CommandMessage] {
   import org.tmt.tcs.mcs.MCSassembly.CommandHandlerActor._
   private val log                = loggerFactory.getLogger
   implicit val duration: Timeout = 20 seconds
@@ -85,11 +86,37 @@ case class CommandHandlerActor(ctx: ActorContext[CommandMessage],
       case Commands.STARTUP  => handleStartupCommand(msg)
       case Commands.SHUTDOWN => handleShutDownCommand(msg)
 
-      case Commands.DATUM      => handleDatumCommand(msg)
-      case Commands.MOVE       => handleMoveCommand(msg)
-      case Commands.DUMMY_LONG => commandResponseManager.addOrUpdateCommand(CommandResponse.Completed(msg.controlCommand.runId))
-      case _                   => log.error(msg = s"Incorrect command : $msg is sent to MCS Assembly CommandHandlerActor")
+      case Commands.DATUM             => handleDatumCommand(msg)
+      case Commands.MOVE              => handleMoveCommand(msg)
+      case Commands.DUMMY_LONG        => commandResponseManager.addOrUpdateCommand(CommandResponse.Completed(msg.controlCommand.runId))
+      case Commands.READCONFIGURATION => handleReadConfCmd(msg)
+      case _                          => log.error(msg = s"Incorrect command : $msg is sent to MCS Assembly CommandHandlerActor")
     }
+  }
+
+  def handleReadConfCmd(msg: submitCommandMsg) = {
+    log.info(msg = "Sending  ReadConf command to HCD")
+    hcdLocation match {
+      case Some(commandService) =>
+        /*        val responseFuture: Future[CommandResponse.SubmitResponse] = commandService.submit(msg.controlCommand)
+        responseFuture.map(resp => commandResponseManager.addOrUpdateCommand(resp))*/
+        commandResponseManager.addOrUpdateCommand(Await.result(commandService.submit(msg.controlCommand), 5.seconds))
+      case None => log.error("Can't locate mcs hcd location : $hcdLocation in ReadCmdActor ")
+      /* Future.successful(Error(Id(), s"Can't locate mcs hcd location : $hcdLocation in ReadCmdActor "))*/
+    }
+    /* val readCmdActor: ActorRef[ControlCommand] =
+          ctx.spawnAnonymous(ReadCmdActor.createObject(commandResponseManager, hcdLocation, loggerFactory))
+        readCmdActor ! msg.controlCommand*/
+    /*hcdLocation match {
+      case Some(commandService) =>
+        val response = Await.result(commandService.submit(msg.controlCommand), 10.seconds)
+        // log.info(s"Response for ReadConf command in Assembly is : $response")
+        commandResponseManager.addOrUpdateCommand(response)
+        Behavior.stopped
+      case None =>
+        Future.successful(Error(Id(), s"Can't locate mcs hcd location : $hcdLocation in ReadCmdActor "))
+        Behavior.unhandled
+    }*/
   }
   def handleShutDownCommand(msg: submitCommandMsg): Unit = {
     log.info(msg = s"In assembly command Handler Actor submitting shutdown command")
@@ -104,13 +131,9 @@ case class CommandHandlerActor(ctx: ActorContext[CommandMessage],
     }
   }
   def handleStartupCommand(msg: submitCommandMsg): Unit = {
-    //   val setup = Setup(mcsHCDPrefix, CommandName(Commands.STARTUP), msg.controlCommand.maybeObsId)
     hcdLocation match {
       case Some(commandService: CommandService) =>
-        val response = Await.result(commandService.submit(msg.controlCommand), 5.seconds)
-        //log.info(msg = s" Result of startup command is : $response")
-        /* commandResponseManager.addSubCommand(msg.controlCommand.runId, response.runId)
-        commandResponseManager.updateSubCommand(response)*/
+        val response = Await.result(commandService.submit(msg.controlCommand), 10.seconds)
         commandResponseManager.addOrUpdateCommand(response)
         log.info(msg = s"Successfully updated status of startup command in commandResponseManager : $response")
       case None => log.error(msg = s" Error in finding HCD instance while submitting startup command to HCD ")
@@ -119,21 +142,18 @@ case class CommandHandlerActor(ctx: ActorContext[CommandMessage],
 
   def handleDatumCommand(msg: submitCommandMsg) = {
     log.info(msg = "Sending  Datum command to DatumCommandActor")
-
     val datumCommandActor: ActorRef[ControlCommand] =
       ctx.spawn(DatumCommandActor.createObject(commandResponseManager, hcdLocation, loggerFactory), "DatumCommandActor")
     datumCommandActor ! msg.controlCommand
   }
 
   def handleMoveCommand(msg: submitCommandMsg) = {
-    //log.info(msg = "Sending  Move command to MoveCommandActor")
     val moveCommandActor: ActorRef[ControlCommand] =
       ctx.spawn(MoveCommandActor.createObject(commandResponseManager, hcdLocation, loggerFactory), "MoveCommandActor")
     moveCommandActor ! msg.controlCommand
   }
 
   def handleFollowCommand(msg: ImmediateCommand): Unit = {
-    // log.info(msg = "Sending  Follow command to FollowCommandActor")
     val followCommandActor: ActorRef[ImmediateCommand] =
       ctx.spawn(FollowCommandActor.createObject(hcdLocation, loggerFactory), "FollowCommandActor")
     followCommandActor ! msg

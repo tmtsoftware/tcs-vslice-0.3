@@ -144,7 +144,7 @@ case class ParamSetTransformer(loggerFactory: LoggerFactory) {
       .add(timestamp)
   }
   def getMCSHealth(health: McsHealth): CurrentState = {
-    val healthParam: Parameter[String]                = EventConstants.HEALTH_KEY.set(health.getHealth.name())
+    val healthParam: Parameter[String]                = EventConstants.HEALTH_KEY.set(health.getHealthMCS.name())
     val healthReasonParam: Parameter[String]          = EventConstants.HEALTH_REASON_KEY.set(health.getReason)
     val protoTimeStamp: com.google.protobuf.Timestamp = health.getTime
     val timestamp                                     = timeStampKey.set(Instant.ofEpochSecond(protoTimeStamp.getSeconds, protoTimeStamp.getNanos))

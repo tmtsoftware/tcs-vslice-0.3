@@ -2,17 +2,13 @@ package org.tmt.tcs.mcs.MCShcd.workers
 
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
-import akka.util.Timeout
 import org.tmt.tcs.mcs.MCShcd.Protocol.{SimpleSimMsg, ZeroMQMessage}
-
-import scala.concurrent.duration._
-import akka.actor.typed.scaladsl.AskPattern._
 import csw.command.client.CommandResponseManager
 import csw.logging.scaladsl.{Logger, LoggerFactory}
-import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.ControlCommand
+import org.tmt.tcs.mcs.MCShcd.Protocol.SimpleSimMsg.ProcessCommand
+import org.tmt.tcs.mcs.MCShcd.Protocol.ZeroMQMessage.SubmitCommand
 import org.tmt.tcs.mcs.MCShcd.constants.Commands
-
-import scala.concurrent.Await
 
 object ShutdownCmdActor {
   def create(commandResponseManager: CommandResponseManager,
@@ -36,22 +32,15 @@ case class ShutdownCmdActor(ctx: ActorContext[ControlCommand],
   override def onMessage(msg: ControlCommand): Behavior[ControlCommand] = {
     log.info(s"Submitting shutdown  command with id : ${msg.runId} to Protocol")
     simulatorMode match {
-      case Commands.REAL_SIMULATOR => {
-        submitToRealSim(msg)
+      case Commands.REAL_SIMULATOR =>
+        zeroMQProtoActor ! SubmitCommand(msg)
         Behaviors.stopped
-      }
-      case Commands.SIMPLE_SIMULATOR => {
-        submitToSimpleSim(msg)
+      case Commands.SIMPLE_SIMULATOR =>
+        simpleSimActor ! ProcessCommand(msg)
         Behaviors.stopped
-      }
     }
-
-    //val commandResponse: CommandResponse = subSystemManager.sendCommand(msg)
-    //log.info(s"Response from Protocol for command runID : ${msg.runId} is : ${commandResponse}")
-    // commandResponseManager.addOrUpdateCommand(msg.runId, commandResponse)
-    Behavior.stopped
   }
-  def submitToRealSim(msg: ControlCommand) = {
+  /* def submitToRealSim(msg: ControlCommand) = {
     implicit val duration: Timeout = 20 seconds
     implicit val scheduler         = ctx.system.scheduler
     val response: ZeroMQMessage = Await.result(zeroMQProtoActor ? { ref: ActorRef[ZeroMQMessage] =>
@@ -79,5 +68,5 @@ case class ShutdownCmdActor(ctx: ActorContext[ControlCommand],
       case _ =>
         commandResponseManager.addOrUpdateCommand(CommandResponse.Error(msg.runId, "Unable to submit command to SimpleSimulator"))
     }
-  }
+  }*/
 }

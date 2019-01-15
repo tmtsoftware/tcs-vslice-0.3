@@ -50,32 +50,29 @@ case class FollowCmdActor(ctx: ActorContext[ImmediateCommand],
     implicit val duration: Timeout = 1 seconds
     implicit val scheduler         = ctx.system.scheduler
     val response: SimpleSimMsg = Await.result(simplSimActor ? { ref: ActorRef[SimpleSimMsg] =>
-      SimpleSimMsg.ProcessCommand(msg.controlCommand, ref)
+      SimpleSimMsg.ProcessImmCmd(msg.controlCommand, ref)
     }, 100.millisecond)
     response match {
-      case x: SimpleSimMsg.SimpleSimResp =>
-        msg.sender ! ImmediateCommandResponse(x.commandResponse)
-        log.info(s"Follow command response from simple simulator actor is : ${x.commandResponse}")
+      case x: SimpleSimMsg.ImmCmdResp => msg.sender ! ImmediateCommandResponse(x.commandResponse)
       case _ =>
-        log.error("Unable to submit command to SimpleSimulator")
         msg.sender ! ImmediateCommandResponse(
           CommandResponse.Error(msg.controlCommand.runId, "Unable to submit command to SimpleSimulator")
         )
     }
   }
 
-  private def submitToRealSim(msg: ImmediateCommand) = {
+  private def submitToRealSim(msg: ImmediateCommand): Unit = {
     implicit val duration: Timeout = 1 seconds
     implicit val scheduler         = ctx.system.scheduler
     val response: ZeroMQMessage = Await.result(zeroMQProtoActor ? { ref: ActorRef[ZeroMQMessage] =>
-      ZeroMQMessage.SubmitCommand(ref, msg.controlCommand)
+      ZeroMQMessage.ImmediateCmd(msg.controlCommand, ref)
     }, 100.millisecond)
     response match {
-      case x: ZeroMQMessage.MCSResponse =>
-        msg.sender ! ImmediateCommandResponse(x.commandResponse)
-        log.info(s"Follow command response from zeroMQ actor is : ${x.commandResponse}")
-      case _ => log.error(s"${msg.controlCommand.runId}, Unable to submit command  to RealSimulator.")
-      //msg.sender ! ImmediateCommandResponse(CommandResponse.Error(msg.controlCommand.runId, "Unable to submit command  to RealSimulator."))
+      case x: ZeroMQMessage.ImmediateCmdResp => msg.sender ! ImmediateCommandResponse(x.commandResponse)
+      case _ =>
+        msg.sender ! ImmediateCommandResponse(
+          CommandResponse.Error(msg.controlCommand.runId, "Unable to submit command  to RealSimulator.")
+        )
     }
   }
 }

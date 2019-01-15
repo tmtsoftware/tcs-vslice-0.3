@@ -49,20 +49,15 @@ case class EventTransformerHelper(loggerFactory: LoggerFactory) {
   def getCurrentState(event: SystemEvent): CurrentState = {
     var currentState: CurrentState = null
     try {
-      val azParamOption: Option[Parameter[Double]] = event.get(EventHandlerConstants.AzPosKey)
-      val elParamOption: Option[Parameter[Double]] = event.get(EventHandlerConstants.ElPosKey)
-      //val trackIDOption: Option[Parameter[Int]]    = event.get(EventHandlerConstants.TrackIDKey)
-      val sentTimeOption: Option[Parameter[Instant]] = event.get(EventHandlerConstants.TimeStampKey) //tpk publish time
-
+      val azParamOption: Option[Parameter[Double]]       = event.get(EventHandlerConstants.AzPosKey)
+      val elParamOption: Option[Parameter[Double]]       = event.get(EventHandlerConstants.ElPosKey)
+      val sentTimeOption: Option[Parameter[Instant]]     = event.get(EventHandlerConstants.TimeStampKey) //tpk publish time
       val assemblyRecTimeOpt: Option[Parameter[Instant]] = event.get(EventHandlerConstants.ASSEMBLY_RECEIVAL_TIME_KEY)
-
       currentState = CurrentState(Prefix(EventConstants.TPK_PREFIX), StateName(EventConstants.MOUNT_DEMAND_POSITION))
         .add(azParamOption.get)
         .add(elParamOption.get)
-        /*.add(trackIDOption.get)*/
         .add(sentTimeOption.get)
         .add(assemblyRecTimeOpt.get)
-      // log.info(s"Converted event to current state is $currentState")
     } catch {
       case e: Exception =>
         log.error("Exception in converting event to current state")

@@ -36,13 +36,13 @@ object AssemblyOperationalState extends Enumeration {
 object MonitorMessage {
   case class AssemblyLifeCycleStateChangeMsg(assemblyState: AssemblyLifeCycleState.AssemblyState) extends MonitorMessage
   case class AssemblyOperationalStateChangeMsg(assemblyMotionState: AssemblyOperationalState.AssemblyMotionState)
-      extends MonitorMessage
+    extends MonitorMessage
   case class LocationEventMsg(hcdLocation: Option[CommandService]) extends MonitorMessage
   case class currentStateChangeMsg(currentState: CurrentState)     extends MonitorMessage
   case class GetCurrentState(actorRef: ActorRef[MonitorMessage])   extends MonitorMessage
   case class AssemblyCurrentState(lifeCycleState: AssemblyLifeCycleState.AssemblyState,
                                   operationalState: AssemblyOperationalState.AssemblyMotionState)
-      extends MonitorMessage
+    extends MonitorMessage
 
 }
 object MonitorActor {
@@ -65,7 +65,7 @@ case class MonitorActor(ctx: ActorContext[MonitorMessage],
                         eventHandlerActor: ActorRef[EventMessage],
                         eventTransformer: EventTransformerHelper,
                         loggerFactory: LoggerFactory)
-    extends AbstractBehavior[MonitorMessage] {
+  extends AbstractBehavior[MonitorMessage] {
 
   private val log = loggerFactory.getLogger
 
@@ -79,24 +79,19 @@ case class MonitorActor(ctx: ActorContext[MonitorMessage],
       case x: AssemblyOperationalStateChangeMsg => onAssemblyOperationalStateChangeMsg(x)
       case x: LocationEventMsg                  => onLocationEvent(x.hcdLocation)
       case x: currentStateChangeMsg             => onCurrentStateChange(x)
-      case x: GetCurrentState                   =>
-        // log.info(s"Current lifeCycle state of assembly is : ${assemblyState} and operational state is : ${assemblyMotionState}")
+      case x: GetCurrentState =>
         x.actorRef ! AssemblyCurrentState(assemblyState, assemblyMotionState)
         Behavior.same
-
       case _ =>
         log.error(msg = s"Incorrect message $msg is sent to MonitorActor")
         Behavior.unhandled
-
     }
-    // this
   }
   /*
   This function updates assembly lifecycle state
    */
   def onAssemblyLifeCycleStateChangeMsg(x: MonitorMessage with AssemblyLifeCycleStateChangeMsg): Behavior[MonitorMessage] = {
     log.info(msg = s"Successfully changed monitor assembly lifecycle state to ${x.assemblyState}")
-
     MonitorActor.createObject(x.assemblyState, assemblyMotionState, eventHandlerActor, eventTransformer, loggerFactory)
   }
   /*
@@ -104,7 +99,6 @@ case class MonitorActor(ctx: ActorContext[MonitorMessage],
    */
   def onAssemblyOperationalStateChangeMsg(x: MonitorMessage with AssemblyOperationalStateChangeMsg): Behavior[MonitorMessage] = {
     log.info(msg = s"Successfully changed monitor actor state to ${x.assemblyMotionState}")
-
     MonitorActor.createObject(assemblyState, x.assemblyMotionState, eventHandlerActor, eventTransformer, loggerFactory)
   }
   /*
@@ -139,7 +133,7 @@ case class MonitorActor(ctx: ActorContext[MonitorMessage],
   /*
     TODO : here should be the logic to change assembly states based on currentPosition such as slewing,tracking
    */
-  private def processMCSCurrentPositionEvent(currentState: CurrentState): Unit = {}
+  //private def processMCSCurrentPositionEvent(currentState: CurrentState): Unit = {}
   /*
     This function processes currentState received from HCD CurrentStatePublisher
     - if hcdLifeCycleState is Running then it updates Assembly lifecycle and operational state to running
@@ -162,10 +156,10 @@ case class MonitorActor(ctx: ActorContext[MonitorMessage],
         val assemblyStateEvent = eventTransformer.getAssemblyEvent(assemblyCurrentState)
         eventHandlerActor ! PublishHCDState(assemblyStateEvent)
         MonitorActor.createObject(AssemblyLifeCycleState.Running,
-                                  AssemblyOperationalState.Running,
-                                  eventHandlerActor,
-                                  eventTransformer,
-                                  loggerFactory)
+          AssemblyOperationalState.Running,
+          eventHandlerActor,
+          eventTransformer,
+          loggerFactory)
       case HCDState_Initialized =>
         MonitorActor.createObject(assemblyState, assemblyMotionState, eventHandlerActor, eventTransformer, loggerFactory)
       case HCDState_Off =>
@@ -174,10 +168,10 @@ case class MonitorActor(ctx: ActorContext[MonitorMessage],
             .getAssemblyEvent(AssemblyCurrentState(AssemblyLifeCycleState.Shutdown, AssemblyOperationalState.Disconnected))
         )
         MonitorActor.createObject(AssemblyLifeCycleState.Shutdown,
-                                  AssemblyOperationalState.Disconnected,
-                                  eventHandlerActor,
-                                  eventTransformer,
-                                  loggerFactory)
+          AssemblyOperationalState.Disconnected,
+          eventHandlerActor,
+          eventTransformer,
+          loggerFactory)
       case _ =>
         log.error(
           s"********************** Unknown HCD State received to MonitorActor ************** state is : $hcdLifeCycleState"
@@ -222,10 +216,10 @@ case class MonitorActor(ctx: ActorContext[MonitorMessage],
       case Some(_) =>
         if (assemblyState == AssemblyLifeCycleState.RunningOffline) {
           MonitorActor.createObject(AssemblyLifeCycleState.Running,
-                                    assemblyMotionState,
-                                    eventHandlerActor,
-                                    eventTransformer,
-                                    loggerFactory)
+            assemblyMotionState,
+            eventHandlerActor,
+            eventTransformer,
+            loggerFactory)
         } else {
           Behavior.same
         }
@@ -233,10 +227,10 @@ case class MonitorActor(ctx: ActorContext[MonitorMessage],
       case None =>
         log.error("Assembly got disconnected from HCD")
         MonitorActor.createObject(AssemblyLifeCycleState.RunningOffline,
-                                  assemblyMotionState,
-                                  eventHandlerActor,
-                                  eventTransformer,
-                                  loggerFactory)
+          assemblyMotionState,
+          eventHandlerActor,
+          eventTransformer,
+          loggerFactory)
 
     }
   }
