@@ -61,6 +61,11 @@ By default the mode is set to simple simulator. Varify and if required Edit and 
 `cd tcs-vsclice-0.3/tcs-client/target/universal/stage/bin`  
 `./mcs-main-app`  
 
+On starting client app, client app will prompt below message: Please enter SimulationMode: SimpleSimulator or RealSimulator
+
+Please enter simulation mode as: 'SimpleSimulator' for this scenario
+
+
 #### Step 7 - Start Demand generation in PK  
 `cd tcs-vsclice-0.2/tcs-client/target/universal/stage/bin`  
 `./pk-client-app`  
@@ -98,7 +103,11 @@ By default the mode is set to simple simulator. Varify and if required Edit and 
 
 `export PATH=/java-9-home-path-here/bin:$PATH`  
 `cd tcs-vsclice-0.3/tcs-client/target/universal/stage/bin`  
-`./mcs-main-app`  
+`./mcs-main-app` 
+
+On starting client app, client app will prompt below message: Please enter SimulationMode: SimpleSimulator or RealSimulator
+
+Please enter simulation mode as: 'RealSimulator' for this scenario
 
 #### Step 7 - Start Demand generation in PK  
 `cd tcs-vsclice-0.3/tcs-client/target/universal/stage/bin`  
