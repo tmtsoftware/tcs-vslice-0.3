@@ -77,13 +77,13 @@ public class TpkWrapper {
                 // System.out.printf("%.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n",
                 // mAz, mEl, base1, cap1, m3R, m3T);
 
-                System.out.println("Inside TpkWrapper: mcsAz is: " + mcsAz + ": mcsEl is: " + mcsEl);
+                //System.out.println("Inside TpkWrapper: mcsAz is: " + mcsAz + ": mcsEl is: " + mcsEl);
                 publishMcsDemand(mcsAz, mcsEl);
 
-                System.out.println("Inside TpkWrapper: base is: " + base1 + ": cap is: " + cap1);
+                //System.out.println("Inside TpkWrapper: base is: " + base1 + ": cap is: " + cap1);
                 publishEcsDemand(base1, cap1);
 
-                System.out.println("Inside TpkWrapper: rotation is: " + m3Rotation + ": tilt is: " + m3Tilt);
+                //System.out.println("Inside TpkWrapper: rotation is: " + m3Rotation + ": tilt is: " + m3Tilt);
                 publishM3Demand(m3Rotation, m3Tilt);
 
 
@@ -96,7 +96,7 @@ public class TpkWrapper {
      * invoked TPK will start generation default Demands
      */
     public void initiate() {
-        System.out.println("Inside TpkWrapper: initiate");
+        //System.out.println("Inside TpkWrapper: initiate");
         DemandsCallback cb = new DemandsCallback();
         tpkEndpoint = new TpkPoc();
         tpkEndpoint._register(cb);
@@ -113,7 +113,7 @@ public class TpkWrapper {
      */
     public void newTarget(double ra, double dec) {
         publishDemands = true;
-        System.out.println("Inside TpkWrapper: newTarget");
+        //System.out.println("Inside TpkWrapper: newTarget");
         tpkEndpoint.newTarget(ra, dec);
     }
 

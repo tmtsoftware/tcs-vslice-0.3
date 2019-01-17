@@ -34,14 +34,12 @@ case class ProtoBuffMsgTransformer(loggerFactory: LoggerFactory) extends IMessag
   override def decodeEvent(eventName: String, encodedEventData: Array[Byte]): CurrentState = {
     eventName match {
       case EventConstants.CURRENT_POSITION =>
-        var mcsCurrentPosEvent: McsCurrentPositionEvent = null
-        // log.error(s"Decoding event: $eventName for data: $encodedEventData")
         try {
-          mcsCurrentPosEvent = McsCurrentPositionEvent.parseFrom(encodedEventData)
+          val mcsCurrentPosEvent: McsCurrentPositionEvent = McsCurrentPositionEvent.parseFrom(encodedEventData)
           paramSetTransformer.getMountCurrentPosition(mcsCurrentPosEvent)
         } catch {
           case e: Exception =>
-            log.error("Exception while getting current position", Map.empty, e, noId)
+            log.error("Exception while getting current position skipping this record.", Map.empty, e, noId)
             e.printStackTrace()
             null
         }
@@ -52,14 +50,12 @@ case class ProtoBuffMsgTransformer(loggerFactory: LoggerFactory) extends IMessag
         val driveState: McsDriveStatus = McsDriveStatus.parseFrom(encodedEventData)
         paramSetTransformer.getMCSDriveStatus(driveState)
       case EventConstants.HEALTH_STATE =>
-        var healthState: McsHealth = null
         try {
-          // log.error(s"Decoding event: $eventName for data: $encodedEventData")
-          healthState = McsHealth.parseFrom(encodedEventData)
+          val healthState: McsHealth = McsHealth.parseFrom(encodedEventData)
           paramSetTransformer.getMCSHealth(healthState)
         } catch {
           case e: Exception =>
-            log.error("Exception while getting health event", Map.empty, e, noId)
+            log.error("Exception while getting health event skipping this record", Map.empty, e, noId)
             e.printStackTrace()
             null
         }
@@ -80,14 +76,13 @@ case class ProtoBuffMsgTransformer(loggerFactory: LoggerFactory) extends IMessag
     }
   }
   override def encodeCurrentState(currentState: CurrentState): Array[Byte] = {
-    var azPos = 0.0
-    var elPos = 0.0
-    if (currentState.exists(EventConstants.AzPosKey)) {
-      azPos = currentState.get(EventConstants.AzPosKey).get.head
-    }
-    if (currentState.exists(EventConstants.ElPosKey)) {
-      elPos = currentState.get(EventConstants.ElPosKey).get.head
-    }
+
+    //if (currentState.exists(EventConstants.AzPosKey)) {
+     val azPos = currentState.get(EventConstants.AzPosKey).get.head
+    //}
+    //if (currentState.exists(EventConstants.ElPosKey)) {
+      val elPos = currentState.get(EventConstants.ElPosKey).get.head
+    //}
 
     val hcdRecInstant   = currentState.get(EventConstants.HcdReceivalTime_Key).get.head
     val hcdRecTimeStamp = Timestamp.newBuilder().setNanos(hcdRecInstant.getNano).setSeconds(hcdRecInstant.getEpochSecond).build()

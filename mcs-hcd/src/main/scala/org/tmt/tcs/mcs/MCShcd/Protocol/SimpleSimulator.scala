@@ -48,7 +48,7 @@ case class SimpleSimulator(ctx: ActorContext[SimpleSimMsg],
                            commandResponseManager: CommandResponseManager,
                            loggerFactory: LoggerFactory,
                            statePublisherActor: ActorRef[EventMessage])
-  extends AbstractBehavior[SimpleSimMsg] {
+    extends AbstractBehavior[SimpleSimMsg] {
   private val log: Logger = loggerFactory.getLogger
 
   val prefix: Prefix = Prefix(Subsystem.MCS.toString)
@@ -121,32 +121,10 @@ case class SimpleSimulator(ctx: ActorContext[SimpleSimMsg],
         demandCounter = demandCounter + 1
         demandBuffer += DemandPosHolder(pkPublishIns, assemblyRecIns, hcdRecIns, simulatorRecTime)
         if (demandCounter == 100000 && !fileUpdate) {
-          val demandPosLogFile: File = new File(logFilePath + "/PosDemEventSimpleLog_" + System.currentTimeMillis() + ".txt")
-          val isDemFileCreated : Boolean = demandPosLogFile.createNewFile()
-          log.info(s"Pos demand log file created ?: $isDemFileCreated")
-          val printStream: PrintStream = new PrintStream(new FileOutputStream(demandPosLogFile),true)
-          printStream.println(
-            "PK publish timeStamp(t0),Assembly receive timeStamp(t1),HCD receive timeStamp(t2),Simulator receive timeStamp(t3)," +
-              "PK to AssemblyTime(t1-t0),Assembly to HCDTime(t2-t0),HCD to SimulatorTime(t3-t2),PK to simulator totalTime(t3-t0)"
-          )
-          val demandPosList = demandBuffer.toList
-          demandPosList.foreach(cp => {
-            val pkToAssembly: Double  = Duration.between(cp.pkPublishTime, cp.assemblyRecTime).toNanos / 1000
-            val assemblyToHCD: Double = Duration.between(cp.assemblyRecTime, cp.hcdRecTime).toNanos / 1000
-            val hcdToSim: Double      = Duration.between(cp.hcdRecTime, cp.simRecTime).toNanos / 1000
-            val pkToSim: Double       = Duration.between(cp.pkPublishTime, cp.simRecTime).toNanos / 1000
-
-            val str: String = s"${getDate(cp.pkPublishTime).trim},${getDate(cp.assemblyRecTime).trim}," +
-              s"${getDate(cp.hcdRecTime).trim},${getDate(cp.simRecTime).trim},${pkToAssembly.toString.trim}," +
-              s"${assemblyToHCD.toString.trim},${hcdToSim.toString.trim},${pkToSim.toString.trim}"
-            printStream.println(str)
-            println(s"Received demands are: $str")
-          })
-          printStream.flush()
-          printStream.close()
+          writeOneWayCmdDataToFile
           fileUpdate = true
         } else {
-          println(s"Still subscribing demands, count is: $demandCounter")
+          log.info(s"$demandCounter")
         }
         Behavior.same
 
@@ -160,38 +138,13 @@ case class SimpleSimulator(ctx: ActorContext[SimpleSimMsg],
         val elPos            = event.get(EventConstants.ElPosKey).get.head
         this.azPosDemand.set(doubleToLongBits(azPos))
         this.elPosDemand.set(doubleToLongBits(elPos))
-        log.info(s"Received event : $msg from Assembly")
-
-
         demandCounter = demandCounter + 1
         demandBuffer += DemandPosHolder(tpkPublishTime, assemblyRecTime, hcdRecTime, simpleSimRecTime)
         if (demandCounter == 100000 && !fileUpdate) {
-          val demandPosLogFile: File = new File(logFilePath + "/PosDemEventSimpleLog_" + System.currentTimeMillis() + ".txt")
-          val isDemFileCreated: Boolean = demandPosLogFile.createNewFile()
-          log.info(s"Pos demand log file created ?: $isDemFileCreated")
-          val printStream: PrintStream = new PrintStream(new FileOutputStream(demandPosLogFile),true)
-          printStream.println(
-            "PK publish timeStamp(t0),Assembly receive timeStamp(t1),HCD receive timeStamp(t2),Simulator receive timeStamp(t3)," +
-              "PK to AssemblyTime(t1-t0),Assembly to HCDTime(t2-t0),HCD to SimulatorTime(t3-t2),PK to simulator totalTime(t3-t0)"
-          )
-          val demandPosList = demandBuffer.toList
-          demandPosList.foreach(cp => {
-            val pkToAssembly: Double  = Duration.between(cp.pkPublishTime, cp.assemblyRecTime).toNanos / 1000
-            val assemblyToHCD: Double = Duration.between(cp.assemblyRecTime, cp.hcdRecTime).toNanos / 1000
-            val hcdToSim: Double      = Duration.between(cp.hcdRecTime, cp.simRecTime).toNanos / 1000
-            val pkToSim: Double       = Duration.between(cp.pkPublishTime, cp.simRecTime).toNanos / 1000
-
-            val str: String = s"${getDate(cp.pkPublishTime).trim},${getDate(cp.assemblyRecTime).trim}," +
-              s"${getDate(cp.hcdRecTime).trim},${getDate(cp.simRecTime).trim},${pkToAssembly.toString.trim}," +
-              s"${assemblyToHCD.toString.trim},${hcdToSim.toString.trim},${pkToSim.toString.trim}"
-            printStream.println(str)
-            println(s"Received demands are: $str")
-          })
-          printStream.flush()
-          printStream.close()
+          writeEventDemandDataToFile
           fileUpdate = true
         } else {
-          println(s"Still subscribing demands, count is: $demandCounter")
+          log.info(s" $demandCounter")
         }
         Behavior.same
 
@@ -208,36 +161,93 @@ case class SimpleSimulator(ctx: ActorContext[SimpleSimMsg],
         demandCounter = demandCounter + 1
         demandBuffer += DemandPosHolder(tpkPublishTime, assemblyRecTime, hcdRecTime, simpleSimRecTime)
         if (demandCounter == 100000 && !fileUpdate) {
-          val demandPosLogFile: File = new File(logFilePath + "/PosDemEventSimpleLog_" + System.currentTimeMillis() + ".txt")
-          val isDemFileCreated: Boolean = demandPosLogFile.createNewFile()
-          log.info(s"Pos demand log file created ?: $isDemFileCreated")
-          val printStream: PrintStream = new PrintStream(new FileOutputStream(demandPosLogFile),true)
-          printStream.println(
-            "PK publish timeStamp(t0),Assembly receive timeStamp(t1),HCD receive timeStamp(t2),Simulator receive timeStamp(t3)," +
-              "PK to AssemblyTime(t1-t0),Assembly to HCDTime(t2-t0),HCD to SimulatorTime(t3-t2),PK to simulator totalTime(t3-t0)"
-          )
-          val demandPosList = demandBuffer.toList
-          demandPosList.foreach(cp => {
-            val pkToAssembly: Double  = Duration.between(cp.pkPublishTime, cp.assemblyRecTime).toNanos / 1000
-            val assemblyToHCD: Double = Duration.between(cp.assemblyRecTime, cp.hcdRecTime).toNanos / 1000
-            val hcdToSim: Double      = Duration.between(cp.hcdRecTime, cp.simRecTime).toNanos / 1000
-            val pkToSim: Double       = Duration.between(cp.pkPublishTime, cp.simRecTime).toNanos / 1000
-
-            val str: String = s"${getDate(cp.pkPublishTime).trim},${getDate(cp.assemblyRecTime).trim}," +
-              s"${getDate(cp.hcdRecTime).trim},${getDate(cp.simRecTime).trim},${pkToAssembly.toString.trim}," +
-              s"${assemblyToHCD.toString.trim},${hcdToSim.toString.trim},${pkToSim.toString.trim}"
-            printStream.println(str)
-            println(s"Received demands are: $str")
-          })
-          printStream.flush()
-          printStream.close()
+          writeCurrentStatesDataToFile
           fileUpdate = true
         } else {
-          println(s"Still subscribing demands, count is: $demandCounter")
+          log.info(s"$demandCounter")
         }
         Behavior.same
     }
   }
+
+  private def writeCurrentStatesDataToFile = {
+    val demandPosLogFile: File    = new File(logFilePath + "/PosDemEventSimpleLog_" + System.currentTimeMillis() + ".txt")
+    val isDemFileCreated: Boolean = demandPosLogFile.createNewFile()
+    log.error(s"Pos demand log file created ?: $isDemFileCreated")
+    val printStream: PrintStream = new PrintStream(new FileOutputStream(demandPosLogFile), true)
+    printStream.println(
+      "PK publish timeStamp(t0),Assembly receive timeStamp(t1),HCD receive timeStamp(t2),Simulator receive timeStamp(t3)," +
+      "PK to AssemblyTime(t1-t0),Assembly to HCDTime(t2-t0),HCD to SimulatorTime(t3-t2),PK to simulator totalTime(t3-t0)"
+    )
+    val demandPosList = demandBuffer.toList
+    demandPosList.foreach(cp => {
+      val pkToAssembly: Double  = Duration.between(cp.pkPublishTime, cp.assemblyRecTime).toNanos.toDouble / 1000000
+      val assemblyToHCD: Double = Duration.between(cp.assemblyRecTime, cp.hcdRecTime).toNanos.toDouble / 1000000
+      val hcdToSim: Double      = Duration.between(cp.hcdRecTime, cp.simRecTime).toNanos.toDouble / 1000000
+      val pkToSim: Double       = Duration.between(cp.pkPublishTime, cp.simRecTime).toNanos.toDouble / 1000000
+
+      val str: String = s"${getDate(cp.pkPublishTime).trim},${getDate(cp.assemblyRecTime).trim}," +
+      s"${getDate(cp.hcdRecTime).trim},${getDate(cp.simRecTime).trim},${pkToAssembly.toString.trim}," +
+      s"${assemblyToHCD.toString.trim},${hcdToSim.toString.trim},${pkToSim.toString.trim}"
+      printStream.println(str)
+    })
+    printStream.flush()
+    printStream.close()
+    log.error(s"Successfully written data to file: ${demandPosLogFile.getAbsolutePath}")
+  }
+
+  private def writeEventDemandDataToFile = {
+    val demandPosLogFile: File    = new File(logFilePath + "/PosDemEventSimpleLog_" + System.currentTimeMillis() + ".txt")
+    val isDemFileCreated: Boolean = demandPosLogFile.createNewFile()
+    log.info(s"Pos demand log file created ?: $isDemFileCreated")
+    val printStream: PrintStream = new PrintStream(new FileOutputStream(demandPosLogFile), true)
+    printStream.println(
+      "PK publish timeStamp(t0),Assembly receive timeStamp(t1),HCD receive timeStamp(t2),Simulator receive timeStamp(t3)," +
+      "PK to AssemblyTime(t1-t0),Assembly to HCDTime(t2-t0),HCD to SimulatorTime(t3-t2),PK to simulator totalTime(t3-t0)"
+    )
+    val demandPosList = demandBuffer.toList
+    demandPosList.foreach(cp => {
+      val pkToAssembly: Double  = Duration.between(cp.pkPublishTime, cp.assemblyRecTime).toNanos.toDouble / 1000000
+      val assemblyToHCD: Double = Duration.between(cp.assemblyRecTime, cp.hcdRecTime).toNanos.toDouble / 1000000
+      val hcdToSim: Double      = Duration.between(cp.hcdRecTime, cp.simRecTime).toNanos.toDouble / 1000000
+      val pkToSim: Double       = Duration.between(cp.pkPublishTime, cp.simRecTime).toNanos.toDouble / 1000000
+
+      val str: String = s"${getDate(cp.pkPublishTime).trim},${getDate(cp.assemblyRecTime).trim}," +
+      s"${getDate(cp.hcdRecTime).trim},${getDate(cp.simRecTime).trim},${pkToAssembly.toString.trim}," +
+      s"${assemblyToHCD.toString.trim},${hcdToSim.toString.trim},${pkToSim.toString.trim}"
+      printStream.println(str)
+    })
+    log.info(s"Successfully written data to file: ${demandPosLogFile.getAbsolutePath}")
+    printStream.flush()
+    printStream.close()
+  }
+
+  private def writeOneWayCmdDataToFile = {
+    val demandPosLogFile: File    = new File(logFilePath + "/PosDemEventSimpleLog_" + System.currentTimeMillis() + ".txt")
+    val isDemFileCreated: Boolean = demandPosLogFile.createNewFile()
+    log.info(s"Pos demand log file created ?: $isDemFileCreated")
+    val printStream: PrintStream = new PrintStream(new FileOutputStream(demandPosLogFile), true)
+    printStream.println(
+      "PK publish timeStamp(t0),Assembly receive timeStamp(t1),HCD receive timeStamp(t2),Simulator receive timeStamp(t3)," +
+      "PK to AssemblyTime(t1-t0),Assembly to HCDTime(t2-t0),HCD to SimulatorTime(t3-t2),PK to simulator totalTime(t3-t0)"
+    )
+    val demandPosList = demandBuffer.toList
+    demandPosList.foreach(cp => {
+      val pkToAssembly: Double  = Duration.between(cp.pkPublishTime, cp.assemblyRecTime).toNanos.toDouble / 1000000
+      val assemblyToHCD: Double = Duration.between(cp.assemblyRecTime, cp.hcdRecTime).toNanos.toDouble / 1000000
+      val hcdToSim: Double      = Duration.between(cp.hcdRecTime, cp.simRecTime).toNanos.toDouble / 1000000
+      val pkToSim: Double       = Duration.between(cp.pkPublishTime, cp.simRecTime).toNanos.toDouble / 1000000
+
+      val str: String = s"${getDate(cp.pkPublishTime).trim},${getDate(cp.assemblyRecTime).trim}," +
+      s"${getDate(cp.hcdRecTime).trim},${getDate(cp.simRecTime).trim},${pkToAssembly.toString.trim}," +
+      s"${assemblyToHCD.toString.trim},${hcdToSim.toString.trim},${pkToSim.toString.trim}"
+      printStream.println(str)
+    })
+    printStream.flush()
+    printStream.close()
+    log.info(s"Successfully written data to file: ${demandPosLogFile.getAbsolutePath}")
+  }
+
   def updateSimulator(commandName: String): Unit = {
     commandName match {
       case Commands.READCONFIGURATION =>
@@ -257,11 +267,11 @@ case class SimpleSimulator(ctx: ActorContext[SimpleSimMsg],
   }
   def updateCurrPosPublisher(value: Boolean): Unit = {
     this.currentPosPublisher.set(value)
-    println(s"Updating CurrentPosition publisher to : $value")
+    // println(s"Updating CurrentPosition publisher to : $value")
   }
   def updateHealthPublisher(value: Boolean): Unit = {
     this.healthPublisher.set(value)
-    println(s"Updating Health publisher to : ${this.healthPublisher.get()}")
+    //println(s"Updating Health publisher to : ${this.healthPublisher.get()}")
   }
 
   val currentPosRunner = new Runnable {

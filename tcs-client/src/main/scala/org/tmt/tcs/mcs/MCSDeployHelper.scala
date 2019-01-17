@@ -123,7 +123,7 @@ case class MCSDeployHelper(simulatorMode: String) {
     import java.time.Duration
     val diff      = Duration.between(startUpSentTime, startUpRespTime).toNanos
     val millidiff = Duration.between(startUpSentTime, startUpRespTime).toMillis
-    println(s"Startup command response is :$response time is : $diff, $millidiff")
+    //println(s"Startup command response is :$response time is : $diff, $millidiff")
     response
   }
   def sendShutDownCmd()(implicit ec: ExecutionContext): CommandResponse = {
@@ -135,7 +135,7 @@ case class MCSDeployHelper(simulatorMode: String) {
     import java.time.Duration
     val diff     = Duration.between(shutDownSentTime, shutDownRespTime).toNanos
     val millDiff = Duration.between(shutDownSentTime, shutDownRespTime).toMillis
-    println(s"Shutdown command response is :$response time is : $diff, $millDiff")
+    //println(s"Shutdown command response is :$response time is : $diff, $millDiff")
     response
   }
   def sendDatumCommand(): CommandResponse = {
@@ -148,7 +148,7 @@ case class MCSDeployHelper(simulatorMode: String) {
     import java.time.Duration
     val diff      = Duration.between(datumSentTime, datumRespTime).toNanos
     val milliDiff = Duration.between(datumSentTime, datumRespTime).toMillis
-    println(s"Datum command response is :$response time is : $diff, $milliDiff")
+    //println(s"Datum command response is :$response time is : $diff, $milliDiff")
     response
   }
   def sendFollowCommand(): SubmitResponse = {
@@ -160,7 +160,7 @@ case class MCSDeployHelper(simulatorMode: String) {
     import java.time.Duration
     val diff      = Duration.between(followSentTime, followRespTime).toNanos
     val milliDiff = Duration.between(followSentTime, followRespTime).toMillis
-    println(s"Follow command response is :$response time is : $diff, $milliDiff")
+   // println(s"Follow command response is :$response time is : $diff, $milliDiff")
     response
   }
   def sendSimulationModeCommand(): SubmitResponse = {
@@ -174,7 +174,7 @@ case class MCSDeployHelper(simulatorMode: String) {
     import java.time.Duration
     val diff      = Duration.between(simModeSentTime, simModeRespTime).toNanos
     val milliDiff = Duration.between(simModeSentTime, simModeRespTime).toMillis
-    println(s"SimulationMode command response is : $response total time taken is : $diff, milli difference : $milliDiff")
+    //println(s"SimulationMode command response is : $response total time taken is : $diff, milli difference : $milliDiff")
     response
   }
   def sendMoveCommand(): SubmitResponse = {
@@ -192,7 +192,7 @@ case class MCSDeployHelper(simulatorMode: String) {
     import java.time.Duration
     val diff      = Duration.between(moveSentTime, moveRespTime).toNanos
     val milliDiff = Duration.between(moveSentTime, moveRespTime).toMillis
-    println(s"Move command response is : $response total time taken is : $diff, milli diff.n is : $milliDiff")
+   // println(s"Move command response is : $response total time taken is : $diff, milli diff.n is : $milliDiff")
     response
   }
 
@@ -228,19 +228,14 @@ case class MCSDeployHelper(simulatorMode: String) {
     LocalDateTime.ofInstant(instant, ZoneId.of(DeployConstants.zoneFormat)).format(DeployConstants.formatter)
 
   def startSubscribingEvents(): Unit = {
-    println(" ****** Started subscribing Events from Assembly ****** ")
+    //println(" ****** Started subscribing Events from Assembly ****** ")
     val eventService = getEventService
     val subscriber   = eventService.defaultSubscriber
     subscriber.subscribeCallback(DeployConstants.currentPositionSet, event => processCurrentPosition(event))
     subscriber.subscribeCallback(DeployConstants.healthSet, event => processHealth(event))
-    subscriber.subscribeCallback(DeployConstants.dummyEventKey, event => proecessDummyEvent(event))
   }
-  def proecessDummyEvent(event: Event): Future[_] = {
-    //println(s"** Received event : ${event} from Assembly. ** ")
-    Future.successful[String]("Successfully processed Dummy event from assembly")
-  }
-  def processHealth(event: Event): Future[_] = {
-    // println(s"*** Received health event: $event from assembly *** ")
+
+  def processHealth(event: Event): Unit = {
     val clientAppRecTime = Instant.now()
     event match {
       case systemEvent: SystemEvent =>
@@ -251,24 +246,24 @@ case class MCSDeployHelper(simulatorMode: String) {
         val assemblyRecTime                      = params.find(msg => msg.keyName == EventConstants.ASSEMBLY_EVENT_RECEIVAL_TIME).get.head
       //println(s"Health, $simulatorPublishTime, $hcdReceiveTime, $assemblyRecTime, $clientAppRecTime")
     }
-    Future.successful[String]("Successfully processed Health event from assembly")
+    //Future.successful[String]("Successfully processed Health event from assembly")
   }
-  def processCurrentPosition(event: Event): Future[_] = {
+  def processCurrentPosition(event: Event): Unit = {
     currPosCounter = currPosCounter + 1
     if (currPosCounter <= 100000) {
       val clientAppRecTime = Instant.now()
       event match {
         case systemEvent: SystemEvent =>
-          val params                   = systemEvent.paramSet
-          val azPosParam: Parameter[_] = params.find(msg => msg.keyName == EventConstants.POINTING_KERNEL_AZ_POS).get
-          val elPosParam: Parameter[_] = params.find(msg => msg.keyName == EventConstants.POINTING_KERNEL_EL_POS).get
-          val simulatorSentTimeParam   = params.find(msg => msg.keyName == EventConstants.TIMESTAMP).get
-          val simulatorPublishTime     = simulatorSentTimeParam.head
-          val hcdReceiveTime           = params.find(msg => msg.keyName == EventConstants.HCD_EventReceivalTime).get.head
-          val assemblyRecTime          = params.find(msg => msg.keyName == EventConstants.ASSEMBLY_EVENT_RECEIVAL_TIME).get.head
-          var simPubTime: Instant      = null
-          var hcdRecTime: Instant      = null
-          var assemblyReTime: Instant  = null
+          val params = systemEvent.paramSet
+          // val azPosParam: Parameter[_] = params.find(msg => msg.keyName == EventConstants.POINTING_KERNEL_AZ_POS).get
+          //val elPosParam: Parameter[_] = params.find(msg => msg.keyName == EventConstants.POINTING_KERNEL_EL_POS).get
+          val simulatorSentTimeParam  = params.find(msg => msg.keyName == EventConstants.TIMESTAMP).get
+          val simulatorPublishTime    = simulatorSentTimeParam.head
+          val hcdReceiveTime          = params.find(msg => msg.keyName == EventConstants.HCD_EventReceivalTime).get.head
+          val assemblyRecTime         = params.find(msg => msg.keyName == EventConstants.ASSEMBLY_EVENT_RECEIVAL_TIME).get.head
+          var simPubTime: Instant     = null
+          var hcdRecTime: Instant     = null
+          var assemblyReTime: Instant = null
           simulatorPublishTime match {
             case x: Instant => simPubTime = x
           }
@@ -279,45 +274,41 @@ case class MCSDeployHelper(simulatorMode: String) {
             case x: Instant => assemblyReTime = x
           }
           currPosBuffer += CurrentPosHolder(simPubTime, hcdRecTime, assemblyReTime, clientAppRecTime)
-          val simToHCD: Long            = Duration.between(simPubTime, hcdRecTime).toNanos
-          val hcdToAssembly: Long       = Duration.between(hcdRecTime, assemblyReTime).toNanos
-          val assemblyToClientApp: Long = Duration.between(assemblyReTime, clientAppRecTime).toNanos
-          val simToClientApp: Long      = Duration.between(simPubTime, clientAppRecTime).toNanos
-
-          println(s"currentposition counter: $currPosCounter")
       }
 
     } else {
       println("Stopped subscribing events as counter reached 1,00,000")
       if (!fileBuilt) {
-        val currPosLogFile: File = new File(logFilePath + "/CurrentPosition_" + System.currentTimeMillis() + "_.txt")
-        currPosLogFile.createNewFile()
-
-        val printStream: PrintStream = new PrintStream(new FileOutputStream(currPosLogFile))
-        printStream.println(
-          "Simulator publish timeStamp(t0),HCD receive timeStamp(t1),Assembly receive timeStamp(t2),ClientApp receive timeStamp(t3),Simulator to HCD(t1-t0)," +
-          "HCD to Assembly(t2-t1),Assembly to ClientApp(t3-t2),Simulator to ClientApp totalTime(t3-t0)"
-        )
-        val currPosList = currPosBuffer.toList
-
-        currPosList.foreach(cp => {
-          val simToHCD: Double            = Duration.between(cp.simPublishTime, cp.hcdRecTime).toNanos / 1000
-          val hcdToAssembly: Double       = Duration.between(cp.hcdRecTime, cp.assemblyRecTime).toNanos / 1000
-          val assemblyToClientApp: Double = Duration.between(cp.assemblyRecTime, cp.clientAppRecTime).toNanos / 1000
-          val simToClientApp: Double      = Duration.between(cp.simPublishTime, cp.clientAppRecTime).toNanos / 1000
-          val str: String = s"${getDate(cp.simPublishTime).trim},${getDate(cp.hcdRecTime).trim}," +
-          s"${getDate(cp.assemblyRecTime).trim},${getDate(cp.clientAppRecTime).trim},${simToHCD.toString.trim}," +
-          s"${hcdToAssembly.toString.trim},${assemblyToClientApp.toString.trim},${simToClientApp.toString.trim}"
-          //log.error(str)
-          println(s"$str")
-          printStream.println(str)
-        })
-        printStream.close()
+        writeCurrPosToFile
         fileBuilt = true
       }
       Thread.sleep(10000)
     }
-    Future.successful[String]("Successfully processed Current position event from assembly")
   }
 
+  private def writeCurrPosToFile = {
+    val currPosLogFile: File = new File(logFilePath + "/CurrentPosition_" + System.currentTimeMillis() + "_.txt")
+    currPosLogFile.createNewFile()
+
+    val printStream: PrintStream = new PrintStream(new FileOutputStream(currPosLogFile), true)
+    printStream.println(
+      "Simulator publish timeStamp(t0),HCD receive timeStamp(t1),Assembly receive timeStamp(t2),ClientApp receive timeStamp(t3),Simulator to HCD(t1-t0)," +
+      "HCD to Assembly(t2-t1),Assembly to ClientApp(t3-t2),Simulator to ClientApp totalTime(t3-t0)"
+    )
+    val currPosList = currPosBuffer.toList
+
+    currPosList.foreach(cp => {
+      val simToHCD: Double            = Duration.between(cp.simPublishTime, cp.hcdRecTime).toNanos.toDouble / 1000000
+      val hcdToAssembly: Double       = Duration.between(cp.hcdRecTime, cp.assemblyRecTime).toNanos.toDouble / 1000000
+      val assemblyToClientApp: Double = Duration.between(cp.assemblyRecTime, cp.clientAppRecTime).toNanos.toDouble / 1000000
+      val simToClientApp: Double      = Duration.between(cp.simPublishTime, cp.clientAppRecTime).toNanos.toDouble / 1000000
+      val str: String = s"${getDate(cp.simPublishTime).trim},${getDate(cp.hcdRecTime).trim}," +
+      s"${getDate(cp.assemblyRecTime).trim},${getDate(cp.clientAppRecTime).trim},${simToHCD.toString.trim}," +
+      s"${hcdToAssembly.toString.trim},${assemblyToClientApp.toString.trim},${simToClientApp.toString.trim}"
+      printStream.println(str)
+    })
+    printStream.flush()
+    printStream.close()
+    println(s"Successfully written data to file:${currPosLogFile.getAbsolutePath}")
+  }
 }

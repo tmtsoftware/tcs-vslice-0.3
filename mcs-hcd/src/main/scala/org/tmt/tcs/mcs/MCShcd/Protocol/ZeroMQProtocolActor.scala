@@ -85,7 +85,6 @@ case class ZeroMQProtocolActor(ctx: ActorContext[ZeroMQMessage],
         msg.controlCommand.commandName.name match {
           case Commands.STARTUP =>
             submitCommandToMCS(msg)
-            // new Thread(() => startSubToSimEvents()).start()
             this.scheduler.execute(eventSubscriber)
             log.info("Started subscribing to events from real Simulator.")
             Behavior.same
@@ -115,7 +114,7 @@ case class ZeroMQProtocolActor(ctx: ActorContext[ZeroMQMessage],
         } catch {
           case ex: Exception =>
             ex.printStackTrace()
-            log.error("Exception in converting current state to byte array")
+            log.error("Exception in converting current state to byte array skipping this record.")
         }
         Behavior.same
 
@@ -133,7 +132,6 @@ case class ZeroMQProtocolActor(ctx: ActorContext[ZeroMQMessage],
             val eventData       = subscribeSocket.recv(ZMQ.NOBLOCK)
             val hcdReceivalTime = Instant.now
             val currentState    = messageTransformer.decodeEvent(eventName, eventData)
-            //  log.error(s"simEventSubscription : ${simEventSubscriber.get()} and event details are: $currentState")
             val currState = currentState.add(EventConstants.hcdEventReceivalTime_Key.set(hcdReceivalTime))
             statePublisherActor ! PublishState(currState)
           } else {

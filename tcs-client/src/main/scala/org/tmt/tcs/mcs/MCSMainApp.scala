@@ -20,8 +20,8 @@ object MCSMainApp extends App {
     case e: Exception =>
       e.printStackTrace()
   }
-  println(
+ /* println(
     s"=======================================================Command set completed ============================================================================="
-  )
+  )*/
   mcsDeployer.startSubscribingEvents()
 }

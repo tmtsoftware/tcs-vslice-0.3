@@ -98,17 +98,16 @@ case class EventHandlerActor(ctx: ActorContext[EventMessage],
   /*
     This function publishes position demands by using currentStatePublisher
    */
-  private def sendEventByAssemblyCurrentState(msg: Event): Future[_] = {
+  private def sendEventByAssemblyCurrentState(msg: Event): Unit = {
 
     msg match {
       case systemEvent: SystemEvent =>
-        //systemEvent.eventTime.time
         val event        = systemEvent.add(EventHandlerConstants.ASSEMBLY_RECEIVAL_TIME_KEY.set(Instant.now()))
         val currentState = eventTransformer.getCurrentState(event)
         currentStatePublisher.publish(currentState)
       case _ => log.error(s"Unable to map received position demands from tpk assembly to systemEvent: $msg")
     }
-    Future.successful("Successfully sent positionDemand by CurrentStatePublisher")
+    // Future.successful("Successfully sent positionDemand by CurrentStatePublisher")
   }
 
   /*

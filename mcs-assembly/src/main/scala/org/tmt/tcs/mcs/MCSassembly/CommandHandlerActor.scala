@@ -43,7 +43,7 @@ case class CommandHandlerActor(ctx: ActorContext[CommandMessage],
                                isOnline: Boolean,
                                hcdLocation: Option[CommandService],
                                loggerFactory: LoggerFactory)
-  extends AbstractBehavior[CommandMessage] {
+    extends AbstractBehavior[CommandMessage] {
   import org.tmt.tcs.mcs.MCSassembly.CommandHandlerActor._
   private val log                = loggerFactory.getLogger
   implicit val duration: Timeout = 20 seconds

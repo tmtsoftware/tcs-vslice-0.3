@@ -34,17 +34,17 @@ import org.tmt.tcs.mcs.MCSassembly.EventMessage.{hcdLocationChanged, StartEventS
 import org.tmt.tcs.mcs.MCSassembly.msgTransformer.EventTransformerHelper
 
 /**
-  * Domain specific logic should be written in below handlers.
-  * This handlers gets invoked when component receives messages/commands from other component/entity.
-  * For example, if one component sends Submit(Setup(args)) command to McsHcd,
-  * This will be first validated in the supervisor and then forwarded to Component TLA which first invokes validateCommand hook
-  * and if validation is successful, then onSubmit hook gets invoked.
-  * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
-  */
+ * Domain specific logic should be written in below handlers.
+ * This handlers gets invoked when component receives messages/commands from other component/entity.
+ * For example, if one component sends Submit(Setup(args)) command to McsHcd,
+ * This will be first validated in the supervisor and then forwarded to Component TLA which first invokes validateCommand hook
+ * and if validation is successful, then onSubmit hook gets invoked.
+ * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
+ */
 class McsAssemblyHandlers(
-                           ctx: ActorContext[TopLevelActorMessage],
-                           cswCtx: CswContext
-                         ) extends ComponentHandlers(ctx, cswCtx: CswContext) {
+    ctx: ActorContext[TopLevelActorMessage],
+    cswCtx: CswContext
+) extends ComponentHandlers(ctx, cswCtx: CswContext) {
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
@@ -61,14 +61,14 @@ class McsAssemblyHandlers(
 
   val eventHandlerActor: ActorRef[EventMessage] =
     ctx.spawn(EventHandlerActor.createObject(eventService, hcdLocation, eventTransformer, currentStatePublisher, loggerFactory),
-      name = "EventHandlerActor")
+              name = "EventHandlerActor")
 
   val monitorActor: ActorRef[MonitorMessage] = ctx.spawn(
     MonitorActor.createObject(AssemblyLifeCycleState.Initalized,
-      AssemblyOperationalState.Ready,
-      eventHandlerActor,
-      eventTransformer,
-      loggerFactory),
+                              AssemblyOperationalState.Ready,
+                              eventHandlerActor,
+                              eventTransformer,
+                              loggerFactory),
     name = "MonitorActor"
   )
   val commandHandlerActor: ActorRef[CommandMessage] = ctx.spawn(
@@ -97,7 +97,7 @@ class McsAssemblyHandlers(
   This function sends shutdown msg to lifecycle actor and updates Monitor actor status to shutdown
    */
   override def onShutdown(): Future[Unit] = Future {
-    log.info(msg = "Shutting down MCS Assembly")
+    log.debug(msg = "Shutting down MCS Assembly")
     monitorActor ! AssemblyLifeCycleStateChangeMsg(AssemblyLifeCycleState.Shutdown)
     lifeCycleActor ! ShutdownMsg()
   }
@@ -112,11 +112,9 @@ class McsAssemblyHandlers(
         hcdStateSubscriber = Some(hcdLocation.get.subscribeCurrentState(monitorActor ! currentStateChangeMsg(_)))
       case LocationRemoved(_) =>
         hcdLocation = None
-        log.error(s"Removing HCD Location registered with assembly")
     }
     monitorActor ! LocationEventMsg(hcdLocation)
     commandHandlerActor ! updateHCDLocation(hcdLocation)
-    log.error(s"Sending hcdLocation:$hcdLocation to eventHandlerActor")
     eventHandlerActor ! hcdLocationChanged(hcdLocation)
   }
 
@@ -126,8 +124,6 @@ class McsAssemblyHandlers(
       case Commands.FOLLOW              => validateFollowCommand(controlCommand)
       case Commands.MOVE                => validateMoveCommand(controlCommand)
       case Commands.DATUM               => validateDatumCommand(controlCommand)
-      case Commands.DUMMY_IMMEDIATE     => executeDummyImmediateCommand(controlCommand)
-      case Commands.DUMMY_LONG          => Accepted(controlCommand.runId)
       case Commands.STARTUP             => Accepted(controlCommand.runId)
       case Commands.SHUTDOWN            => Accepted(controlCommand.runId)
       case Commands.SET_SIMULATION_MODE => Accepted(controlCommand.runId)
@@ -135,10 +131,10 @@ class McsAssemblyHandlers(
       case x                            => Invalid(controlCommand.runId, UnsupportedCommandIssue(s"Command $x is not supported"))
     }
   }
-  def executeDummyImmediateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
-    log.info(msg = s"Executing Dummy Immediate command  : $controlCommand")
-    CommandResponse.Accepted(controlCommand.runId)
-  }
+  /* def executeDummyImmediateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
+     log.info(msg = s"Executing Dummy Immediate command  : $controlCommand")
+     CommandResponse.Accepted(controlCommand.runId)
+   }*/
   /*
   This function validates follow command based on  assembly state received from MonitorActor
   if validation successful then returns command execution response else invalid command response
@@ -147,7 +143,7 @@ class McsAssemblyHandlers(
    */
   private def validateFollowCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
     val assemblyCurrentState = getCurrentAssemblyState
-    log.info(msg = s"Monitor Actor's current state while validating Follow command is  : $assemblyCurrentState")
+    log.debug(msg = s"Monitor Actor's current state while validating Follow command is  : $assemblyCurrentState")
     if (validateAssemblyState(assemblyCurrentState)) {
       Accepted(controlCommand.runId)
     } else {
@@ -186,7 +182,7 @@ class McsAssemblyHandlers(
           case _: CompletedWithResult => monitorActor ! AssemblyOperationalStateChangeMsg(AssemblyOperationalState.Slewing)
           case _: Error               => log.error("Error occurred while processing follow command")
         }
-        log.info(s"Follow command response is : ${msg.submitResponse}")
+        log.debug(s"Follow command response is : ${msg.submitResponse}")
         msg.submitResponse
       case _ =>
         CommandResponse.Invalid(
@@ -211,7 +207,7 @@ class McsAssemblyHandlers(
   private def validateAssemblyState(assemblyCurrentState: MonitorMessage): Boolean = {
     assemblyCurrentState match {
       case x: MonitorMessage.AssemblyCurrentState =>
-        log.info(msg = s"Assembly current state from monitor actor  is : $x")
+        log.debug(msg = s"Assembly current state from monitor actor  is : $x")
         x.lifeCycleState.toString match {
           case "Running" if x.operationalState.toString.equals("Running") => true
           case _                                                          => false
@@ -244,7 +240,7 @@ class McsAssemblyHandlers(
         val assemblyCurrentState = Await.result(monitorActor ? { ref: ActorRef[MonitorMessage] =>
           MonitorMessage.GetCurrentState(ref)
         }, 3.seconds)
-        log.info(msg = s"Response from monitor actor is : $assemblyCurrentState")
+        log.debug(msg = s"Response from monitor actor is : $assemblyCurrentState")
         val assemblyState: Boolean = validateAssemblyState(assemblyCurrentState)
         assemblyState match {
           case true =>
@@ -260,7 +256,7 @@ class McsAssemblyHandlers(
         }
       case false =>
         CommandResponse.Invalid(controlCommand.runId,
-          WrongNumberOfParametersIssue(s" axes parameter is not provided for move command"))
+                                WrongNumberOfParametersIssue(s" axes parameter is not provided for move command"))
     }
   }
   /*
@@ -275,7 +271,7 @@ class McsAssemblyHandlers(
         val assemblyCurrentState = Await.result(monitorActor ? { ref: ActorRef[MonitorMessage] =>
           MonitorMessage.GetCurrentState(ref)
         }, 5.seconds)
-        log.info(msg = s"Response from monitor actor, while validating datum command  is : $assemblyCurrentState")
+        log.debug(msg = s"Response from monitor actor, while validating datum command  is : $assemblyCurrentState")
         val assemblyStateBool = validateAssemblyState(assemblyCurrentState)
         assemblyStateBool match {
           case true => CommandResponse.Accepted(controlCommand.runId)
@@ -289,7 +285,7 @@ class McsAssemblyHandlers(
       case false =>
         log.error(s"Incorrect parameters provided for Datum command ")
         CommandResponse.Invalid(controlCommand.runId,
-          WrongNumberOfParametersIssue(s" axes parameter is not provided for datum command"))
+                                WrongNumberOfParametersIssue(s" axes parameter is not provided for datum command"))
     }
   }
   def getDate(instant: Instant) = LocalDateTime.ofInstant(instant, ZoneId.of(Commands.zoneFormat)).format(Commands.formatter)
@@ -313,18 +309,18 @@ class McsAssemblyHandlers(
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = {
-    log.info(msg = "executing one way command")
+    //log.info(msg = "executing one way command")
   }
 
   //TODO : GoOnlineMSg is operational command..? why GoOnline and GoOffline messages are going to commandHandlerActor
   // If lifecycle commands then what they are supposed to do in LifecycleActor
   override def onGoOffline(): Unit = {
-    log.info(msg = "MCS Assembly going down")
+    //log.info(msg = "MCS Assembly going down")
     commandHandlerActor ! GoOfflineMsg()
   }
 
   override def onGoOnline(): Unit = {
-    log.info(msg = "MCS Assembly going online")
+    //log.info(msg = "MCS Assembly going online")
     commandHandlerActor ! GoOnlineMsg()
   }
 

@@ -59,6 +59,8 @@ class McsHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
                                      HCDOperationalState.DrivePowerOff,
                                      eventService,
                                      simulatorMode,
+                                     null,
+                                     null,
                                      loggerFactory),
     "StatePublisherActor"
   )
@@ -135,7 +137,7 @@ class McsHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
         assemblyDemandsSubscriber = Some(
           assemblyLocation.get.subscribeCurrentState(
             statePublisherActor !
-            AssemblyStateChange(zeroMQProtoActor, simpleSimActor, _)
+            AssemblyStateChange(_)
           )
         )
       case LocationRemoved(_) =>
