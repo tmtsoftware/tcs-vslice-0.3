@@ -436,16 +436,6 @@ class McsHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
     Completed(controlCommand.runId)
   }
 
-  val logFilePath: String = System.getenv("LogFiles")
-  /* val hcdCmdFile: File    = new File(logFilePath + "/Cmd_HCD" + System.currentTimeMillis() + "_.txt")
-  hcdCmdFile.createNewFile()
-  var cmdCounter: Long            = 0
-  val cmdPrintStream: PrintStream = new PrintStream(new FileOutputStream(hcdCmdFile))
-  this.cmdPrintStream.println("HCDReceiveTimeStamp")*/
-
-  def getDate(instant: Instant): String =
-    LocalDateTime.ofInstant(instant, ZoneId.of(Commands.zoneFormat)).format(Commands.formatter)
-
   /*
        This functions routes all commands to Commandhandler actor and bsed upon command execution updates states of HCD by sending it
        to StatePublisher actor
@@ -461,7 +451,6 @@ class McsHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
         log.info("On receipt of startup command changing MCS HCD state to Running")
         Started(controlCommand.runId)
       case Commands.READCONFIGURATION =>
-        //  this.cmdPrintStream.println(getDate(Instant.now()).trim)
         commandHandlerActor ! HCDCommandMessage.submitCommand(controlCommand)
         Started(controlCommand.runId)
       case Commands.SHUTDOWN =>

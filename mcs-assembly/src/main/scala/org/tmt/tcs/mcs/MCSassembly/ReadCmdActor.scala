@@ -1,5 +1,7 @@
 package org.tmt.tcs.mcs.MCSassembly
 
+import java.time.Instant
+
 import akka.actor.Status.Success
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
@@ -13,6 +15,7 @@ import csw.command.client.CommandResponseManager
 import csw.logging.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{Id, Prefix, Subsystem}
 
 object ReadCmdActor {
@@ -29,16 +32,21 @@ case class ReadCmdActor(ctx: ActorContext[ControlCommand],
                         hcdLocation: Option[CommandService],
                         loggerFactory: LoggerFactory)
     extends AbstractBehavior[ControlCommand] {
-  private val log                = loggerFactory.getLogger
-  implicit val duration: Timeout = 10 seconds
+  private val log                                 = loggerFactory.getLogger
+  implicit val duration: Timeout                  = 8 seconds
+  private val AssemblyCmdRecTimeKey: Key[Instant] = KeyType.TimestampKey.make("AssemblyCmdRecTime")
 
   override def onMessage(controlCommand: ControlCommand): Behavior[ControlCommand] = {
-    //log.info(msg = s"Executing ReadConf command $controlCommand")
     hcdLocation match {
       case Some(commandService) =>
-        val response = Await.result(commandService.submit(controlCommand), 10.seconds)
-        // log.info(s"Response for ReadConf command in Assembly is : $response")
-        commandResponseManager.addOrUpdateCommand(response)
+        val clientAppSentTime: Parameter[_] = controlCommand.paramSet.find(msg => msg.keyName == "ClientAppSentTime").get
+        //  log.info(s"Assembly received command: $controlCommand and parameters are: $clientAppSentTime")
+        val setup = Setup(Prefix(Subsystem.MCS.toString), controlCommand.commandName, None)
+          .add(clientAppSentTime)
+          .add(AssemblyCmdRecTimeKey.set(Instant.now()))
+        val response = Await.result(commandService.submit(setup), 8.seconds)
+        commandResponseManager.addSubCommand(controlCommand.runId, setup.runId)
+        commandResponseManager.updateSubCommand(response)
         Behavior.stopped
       case None =>
         Future.successful(Error(Id(), s"Can't locate mcs hcd location : $hcdLocation in ReadCmdActor "))

@@ -28,8 +28,8 @@ import csw.framework.models.CswContext
 import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.commands.CommandIssue.{UnsupportedCommandInStateIssue, UnsupportedCommandIssue, WrongNumberOfParametersIssue}
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandResponse, ControlCommand}
-import csw.params.core.generics.Parameter
+import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.params.core.generics.{Key, KeyType, Parameter}
 import org.tmt.tcs.mcs.MCSassembly.EventMessage.{hcdLocationChanged, StartEventSubscription, StartPublishingDummyEvent}
 import org.tmt.tcs.mcs.MCSassembly.msgTransformer.EventTransformerHelper
 
@@ -76,11 +76,6 @@ class McsAssemblyHandlers(
     "CommandHandlerActor"
   )
   val logFilePath: String = System.getenv("LogFiles")
-  /*val AssemblyCmdFile: File = new File(logFilePath + "/Cmd_Assembly" + System.currentTimeMillis() + "_.txt")
-  AssemblyCmdFile.createNewFile()
-  var cmdCounter: Long            = 0
-  val cmdPrintStream: PrintStream = new PrintStream(new FileOutputStream(AssemblyCmdFile))
-  this.cmdPrintStream.println("AssemblyReciveTimestamp")*/
 
   /*
   This function is CSW in built initalization function
@@ -132,9 +127,9 @@ class McsAssemblyHandlers(
     }
   }
   /* def executeDummyImmediateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
-     log.info(msg = s"Executing Dummy Immediate command  : $controlCommand")
-     CommandResponse.Accepted(controlCommand.runId)
-   }*/
+    log.info(msg = s"Executing Dummy Immediate command  : $controlCommand")
+    CommandResponse.Accepted(controlCommand.runId)
+  }*/
   /*
   This function validates follow command based on  assembly state received from MonitorActor
   if validation successful then returns command execution response else invalid command response
@@ -297,8 +292,7 @@ class McsAssemblyHandlers(
         commandHandlerActor ! submitCommandMsg(controlCommand)
         Started(controlCommand.runId)
       case Commands.SET_SIMULATION_MODE => executeSimModeAndSendResp(controlCommand)
-      case Commands.READCONFIGURATION   =>
-        // this.cmdPrintStream.println(getDate(Instant.now()).trim)
+      case Commands.READCONFIGURATION =>
         commandHandlerActor ! submitCommandMsg(controlCommand)
         Started(controlCommand.runId)
       case Commands.FOLLOW => executeFollowCommandAndSendResponse(controlCommand)

@@ -76,18 +76,11 @@ case class CommandHandlerActor(ctx: ActorContext[HCDCommandMessage],
   private def processSubmitCommand(cmdMessage: submitCommand): Behavior[HCDCommandMessage] = {
     cmdMessage.controlCommand.commandName.name match {
       case Commands.READCONFIGURATION =>
-        simulatorMode match {
-          case Commands.REAL_SIMULATOR =>
-            zeroMQProtoActor ! SubmitCommand(cmdMessage.controlCommand)
-          case Commands.SIMPLE_SIMULATOR =>
-            simpleSimActor ! ProcessCommand(cmdMessage.controlCommand)
-        }
+        val readConfCmdActor: ActorRef[ControlCommand] = ctx.spawnAnonymous(
+          ReadConfCmdActor.create(commandResponseManager, zeroMQProtoActor, simpleSimActor, simulatorMode, loggerFactory)
+        )
+        readConfCmdActor ! cmdMessage.controlCommand
         Behavior.same
-      // log.info("Received readConf command in HCD commandHandler")
-      /* val readConfCmdActor: ActorRef[ControlCommand] = ctx.spawnAnonymous(
-    ReadConfCmdActor.create(commandResponseManager, zeroMQProtoActor, simpleSimActor, simulatorMode, loggerFactory)
-    )
-    readConfCmdActor ! cmdMessage.controlCommand*/
       case Commands.STARTUP =>
         log.info("Starting MCS HCD")
         val startupCmdActor: ActorRef[ControlCommand] = ctx.spawn(

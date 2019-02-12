@@ -78,10 +78,10 @@ case class ProtoBuffMsgTransformer(loggerFactory: LoggerFactory) extends IMessag
   override def encodeCurrentState(currentState: CurrentState): Array[Byte] = {
 
     //if (currentState.exists(EventConstants.AzPosKey)) {
-     val azPos = currentState.get(EventConstants.AzPosKey).get.head
+    val azPos = currentState.get(EventConstants.AzPosKey).get.head
     //}
     //if (currentState.exists(EventConstants.ElPosKey)) {
-      val elPos = currentState.get(EventConstants.ElPosKey).get.head
+    val elPos = currentState.get(EventConstants.ElPosKey).get.head
     //}
 
     val hcdRecInstant   = currentState.get(EventConstants.HcdReceivalTime_Key).get.head
